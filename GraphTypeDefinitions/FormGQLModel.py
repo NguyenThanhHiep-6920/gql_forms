@@ -27,6 +27,7 @@ from ._GraphPermissions import RoleBasedPermission, OnlyForAuthentized
 SectionGQLModel = Annotated["SectionGQLModel", strawberry.lazy(".SectionGQLModel")]
 FormTypeGQLModel = Annotated["FormTypeGQLModel", strawberry.lazy(".FormTypeGQLModel")]
 UserGQLModel = Annotated["UserGQLModel", strawberry.lazy(".externals")]
+RequestGQLModel = Annotated["RequestGQLModel", strawberry.lazy(".RequestGQLModel")]
 
 FormGQLModelDescription = """
 # Reason
@@ -122,6 +123,20 @@ class FormGQLModel(BaseGQLModel):
         result = await FormTypeGQLModel.resolve_reference(info, id=self.type_id)
         return result
   
+    @strawberry.field(
+        description="Retrieves the type of form",
+        permission_classes=[OnlyForAuthentized()])
+    async def request(self, info: strawberry.types.Info) -> typing.Optional["RequestGQLModel"]:
+        from .HistoryGQLModel import HistoryGQLModel
+        loader = HistoryGQLModel.getLoader(info)
+        rows = await loader.filter_by(form_id=self.id)
+        row = next(rows, None)
+        if row is None:
+            return None
+        from .RequestGQLModel import RequestGQLModel
+        result =  await RequestGQLModel.resolve_reference(info, row.request_id)
+        return result
+    
 #############################################################
 #
 # Queries
