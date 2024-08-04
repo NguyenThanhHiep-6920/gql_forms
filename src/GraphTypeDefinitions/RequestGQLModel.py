@@ -6,11 +6,12 @@ import logging
 
 from typing import Annotated
 
-from utils.Dataloaders import getLoadersFromInfo, getUserFromInfo
-from GraphTypeDefinitions._GraphPermissions import RoleBasedPermission
+from uoishelpers.resolvers import getLoadersFromInfo, getUserFromInfo
+
+from ._GraphPermissions import RoleBasedPermission
 from .BaseGQLModel import BaseGQLModel
 from ._GraphPermissions import RoleBasedPermission, OnlyForAuthentized
-from GraphTypeDefinitions._GraphResolvers import (
+from ._GraphResolvers import (
     resolve_id,
     resolve_name,
     resolve_name_en,
@@ -19,8 +20,8 @@ from GraphTypeDefinitions._GraphResolvers import (
     resolve_lastchange,
     resolve_createdby,
     resolve_rbacobject,
-    createRootResolver_by_id,
-    createRootResolver_by_page
+    # createRootResolver_by_id,
+    # createRootResolver_by_page
 )
 
 UserGQLModel = Annotated["UserGQLModel", strawberry.lazy(".externals")]
@@ -110,17 +111,23 @@ async def request_by_id(
 #     skip=0,
 #     limit=10
 #     )
-from ._GraphResolvers import asPage
+from src.DBResolvers import RequestResolvers
+# from ._GraphResolvers import asPage
 
-@strawberry.field(
+# @strawberry.field(
+#     description="Retrieves all requests",
+#     permission_classes=[OnlyForAuthentized(isList=True)])
+# @asPage
+# #async def request_page(self, info: strawberry.types.Info, where: typing.Optional[RequestWhereFilter] = None) -> typing.List[RequestGQLModel]:
+# async def request_page(self, info: strawberry.types.Info, where: typing.Optional[RequestWhereFilter]) -> typing.List[RequestGQLModel]:
+#     logging.info("returning just loader")
+#     return getLoadersFromInfo(info).requests
+
+request_page = strawberry.field(
     description="Retrieves all requests",
-    permission_classes=[OnlyForAuthentized(isList=True)])
-@asPage
-#async def request_page(self, info: strawberry.types.Info, where: typing.Optional[RequestWhereFilter] = None) -> typing.List[RequestGQLModel]:
-async def request_page(self, info: strawberry.types.Info, where: typing.Optional[RequestWhereFilter]) -> typing.List[RequestGQLModel]:
-    logging.info("returning just loader")
-    return getLoadersFromInfo(info).requests
-
+    permission_classes=[OnlyForAuthentized(isList=True)],
+    resolver=RequestResolvers.Page(GQLModel=RequestGQLModel, WhereFilterModel=RequestWhereFilter)
+)
 #############################################################
 #
 # Mutations

@@ -3,10 +3,12 @@ import datetime
 import typing
 import uuid
 
-from utils.Dataloaders import getLoadersFromInfo, getUserFromInfo
+# from utils.Dataloaders import getLoadersFromInfo, getUserFromInfo
+from uoishelpers.resolvers import getLoadersFromInfo, getUserFromInfo
+
 from .BaseGQLModel import BaseGQLModel
-from ._GraphPermissions import OnlyForAuthentized, RoleBasedPermission
-from GraphTypeDefinitions._GraphResolvers import (
+from ._GraphPermissions import OnlyForAuthentized
+from ._GraphResolvers import (
     resolve_id,
     resolve_name,
     resolve_name_en,
@@ -15,8 +17,8 @@ from GraphTypeDefinitions._GraphResolvers import (
     resolve_lastchange,
     resolve_createdby,
     resolve_rbacobject,
-    createRootResolver_by_id,
-    asPage
+    # createRootResolver_by_id,
+    # asPage
 )
 
 FormTypeGQLModel = typing.Annotated["FormTypeGQLModel", strawberry.lazy(".FormTypeGQLModel")]
@@ -67,9 +69,17 @@ class FormCategoryWhereFilter:
     name: str
     name_en: str
 
-form_category_by_id = createRootResolver_by_id(
-    FormCategoryGQLModel, 
-    description="Retrieves the form category")
+from src.DBResolvers import FormCategoryResolvers
+@strawberry.field(
+    description=""
+)
+async def form_category_by_id(self, info: strawberry.types.Info, id: uuid.UUID) -> typing.Optional["FormCategoryGQLModel"]:
+    result = await FormCategoryGQLModel.resolve_reference(info=info, id=id)
+    return result
+
+# form_category_by_id = createRootResolver_by_id(
+#     FormCategoryGQLModel, 
+#     description="Retrieves the form category")
 
 # @strawberry.field(description="Retrieves the form category")
 # async def form_category_by_id(
@@ -89,11 +99,13 @@ form_category_by_id = createRootResolver_by_id(
 #     result = await loader.page(skip=skip, limit=limit, where=wf)
 #     return result
 
-
-@strawberry.field(description='Retrieves the form categories')
-@asPage
-async def form_category_page(self, info: strawberry.types.Info, where: typing.Optional[FormCategoryWhereFilter] = None) -> typing.List[FormCategoryGQLModel]:
-    return getLoadersFromInfo(info).formcategories
+form_category_page = strawberry.field(
+    description='Retrieves the form categories',
+        resolver=FormCategoryResolvers.Page(
+        GQLModel=FormCategoryGQLModel,
+        WhereFilterModel=FormCategoryWhereFilter
+        )
+)
 
 #############################################################
 #

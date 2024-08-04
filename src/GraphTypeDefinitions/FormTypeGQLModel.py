@@ -4,11 +4,11 @@ import typing
 import uuid
 
 from typing import Annotated
-from utils.Dataloaders import getLoadersFromInfo, getUserFromInfo
+from src.utils.Dataloaders import getLoadersFromInfo, getUserFromInfo
 from .BaseGQLModel import BaseGQLModel
 
 from ._GraphPermissions import RoleBasedPermission, OnlyForAuthentized
-from GraphTypeDefinitions._GraphResolvers import (
+from ._GraphResolvers import (
     resolve_id,
     resolve_name,
     resolve_name_en,
@@ -17,7 +17,7 @@ from GraphTypeDefinitions._GraphResolvers import (
     resolve_lastchange,
     resolve_createdby,
     resolve_rbacobject,
-    createRootResolver_by_id,
+    # createRootResolver_by_id,
     # createRootResolver_by_page
 )
 

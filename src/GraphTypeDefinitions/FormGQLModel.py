@@ -5,10 +5,10 @@ import uuid
 import logging
 
 from typing import Annotated
-from utils.Dataloaders import getLoadersFromInfo, getUserFromInfo
+from src.utils.Dataloaders import getLoadersFromInfo, getUserFromInfo
 from .BaseGQLModel import BaseGQLModel
 
-from GraphTypeDefinitions._GraphResolvers import (
+from ._GraphResolvers import (
     resolve_id,
     resolve_name,
     resolve_name_en,
@@ -17,7 +17,7 @@ from GraphTypeDefinitions._GraphResolvers import (
     resolve_lastchange,
     resolve_createdby,
     resolve_rbacobject,
-    createRootResolver_by_id,
+    # createRootResolver_by_id,
     # createRootResolver_by_page,
     # createAttributeScalarResolver,
     # createAttributeVectorResolver
@@ -91,17 +91,18 @@ class FormGQLModel(BaseGQLModel):
     #     sections = await loader.filter_by(form_id=self.id)
     #     return sections
 
-    from ._GraphResolvers import asForeignList
+    # from ._GraphResolvers import asForeignList
 
     @strawberry.field(
         description="Retrieves the sections related to this form (form has several sections), form->section->part->item",
         permission_classes=[OnlyForAuthentized(isList=True)],
         )
-    @asForeignList(foreignKeyName="form_id")
     async def sections(
         self, info: strawberry.types.Info,
     ) -> typing.List["SectionGQLModel"]:
-        return getLoadersFromInfo(info).sections
+        loader = getLoadersFromInfo(info).sections
+        results = await loader.filter_by(form_id=self.id)
+        return results
 
     @strawberry.field(
         description="Retrieves the user who has initiated this request",
@@ -186,17 +187,23 @@ class FormWhereFilter:
 #     result = await loader.page(skip, limit, where=wf)
 #     return result    
 
-from ._GraphResolvers import asPage
-
-@strawberry.field(
+from src.DBResolvers import FormResolvers
+form_page = strawberry.field(
     description="Retrieves the form type",
-    permission_classes=[OnlyForAuthentized()])
-@asPage
-async def form_page(
-    self, info: strawberry.types.Info, skip: int = 0, limit: int = 10,
-    where: typing.Optional[FormWhereFilter] = None
-) -> typing.List[FormGQLModel]:
-    return getLoadersFromInfo(info).forms
+    permission_classes=[OnlyForAuthentized()],
+    resolver=FormResolvers.Page(GQLModel=FormGQLModel, WhereFilterModel=FormWhereFilter))
+
+# from ._GraphResolvers import asPage
+
+# @strawberry.field(
+#     description="Retrieves the form type",
+#     permission_classes=[OnlyForAuthentized()])
+# @asPage
+# async def form_page(
+#     self, info: strawberry.types.Info, skip: int = 0, limit: int = 10,
+#     where: typing.Optional[FormWhereFilter] = None
+# ) -> typing.List[FormGQLModel]:
+#     return getLoadersFromInfo(info).forms
 
 
 

@@ -33,7 +33,8 @@ from .PartGQLModel import PartGQLModel
 
 from .externals import UserGQLModel
 from ._GraphPermissions import RoleBasedPermission
-from utils.Dataloaders import getUserFromInfo
+# from utils.Dataloaders import getUserFromInfo
+from uoishelpers.resolvers import getUserFromInfo
 
 @strawberry.type(description="""Type for query root""")
 class Query:

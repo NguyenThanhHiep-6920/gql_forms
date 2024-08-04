@@ -1841,7 +1841,16 @@
         {"id": "9bdb9426-afb6-11ed-9bd8-0242ac110002", 
             "category_id": "b1cb1462-afb8-11ed-9bd8-0242ac110002",
            "name": "obsah", "query": "", "selector": "" },
-        {"id": "9bdb9476-afb6-11ed-9bd8-0242ac110002", 
+        {"id": "36b53c34-a34f-43a3-9347-0128a5b9e1d9", 
+           "category_id": "b1cb1462-afb8-11ed-9bd8-0242ac110002",
+          "name": "staty", "query": "", "selector": "" },
+        {"id": "90f0bbbd-4743-4965-8cbb-9e66a72b9b67", 
+          "category_id": "b1cb1462-afb8-11ed-9bd8-0242ac110002",
+         "name": "pojistovny", "query": "", "selector": "" },
+       {"id": "27be9340-bd57-4856-b830-0d80dbf06bdd", 
+          "category_id": "b1cb1462-afb8-11ed-9bd8-0242ac110002",
+         "name": "tituly", "query": "", "selector": "" },
+      {"id": "9bdb9476-afb6-11ed-9bd8-0242ac110002", 
             "category_id": "b1cb1462-afb8-11ed-9bd8-0242ac110002",
             "name": "doporučení", "query": "", "selector": "" }
     ],
@@ -1849,7 +1858,7 @@
     "formrequests": [
         {"id": "13181566-afb0-11ed-9bd8-0242ac110002", 
             "type_id": "2e1140f4-afb0-11ed-9bd8-0242ac110002",
-            "createdby": "a79ee8ce-b085-11ed-9bd8-0242ac110002",
+            "createdby": "89d1f638-ae0f-11ed-9bd8-0242ac110002",
             "lastchange": "2023-04-19T20:00:00",
             "name": "Žádost o přerušení studia", "name_en": ""}
     ],
@@ -1857,12 +1866,12 @@
     "forms": [
         {"id": "190d578c-afb1-11ed-9bd8-0242ac110002", 
             "type_id": "2e1140f4-afb0-11ed-9bd8-0242ac110002",
-            "created_by": "2d9dc5ca-a4a2-11ed-b9df-0242ac120003",
+            "createdby": "2d9dc5ca-a4a2-11ed-b9df-0242ac120003",
             "name": "Žádost", "name_en": "", "rbacobject": "2d9dc5ca-a4a2-11ed-b9df-0242ac120003"
          },
         {"id": "190d5a7a-afb1-11ed-9bd8-0242ac110002", 
             "type_id": "2e1140f4-afb0-11ed-9bd8-0242ac110002",
-            "created_by": "2d9dc5ca-a4a2-11ed-b9df-0242ac120003",
+            "createdby": "2d9dc5ca-a4a2-11ed-b9df-0242ac120003",
             "name": "Žádost", "name_en": "", "rbacobject": "2d9dc5ca-a4a2-11ed-b9df-0242ac120003" }
     ],
     "formsections": [
@@ -1906,7 +1915,7 @@
             "part_id": "52e3ee26-afb1-11ed-9bd8-0242ac110002",
             "type_id": "9bdb916a-afb6-11ed-9bd8-0242ac110002",
             "lastchange": "2023-04-19T20:00:00",
-            "order": 1, "name": "user_id", "value": "45678", "name_en": "user_id" },
+            "order": 1, "name": "user_id", "value": "89d1f638-ae0f-11ed-9bd8-0242ac110002", "name_en": "user_id" },
         {"id": "72a3d7b2-afb1-11ed-9bd8-0242ac110002", 
             "part_id": "52e3f22c-afb1-11ed-9bd8-0242ac110002", 
             "type_id": "9bdb9426-afb6-11ed-9bd8-0242ac110002",
@@ -1916,7 +1925,7 @@
             "part_id": "52e3f2d6-afb1-11ed-9bd8-0242ac110002", 
             "type_id": "9bdb916a-afb6-11ed-9bd8-0242ac110002",
             "lastchange": "2023-04-19T20:00:00",
-            "order": 1, "name": "user_id", "value": "45678", "name_en": "user_id" },
+            "order": 1, "name": "user_id", "value": "89d1f638-ae0f-11ed-9bd8-0242ac110002", "name_en": "user_id" },
         {"id": "72a3d8de-afb1-11ed-9bd8-0242ac110002", 
             "part_id": "52e3f344-afb1-11ed-9bd8-0242ac110002", 
             "type_id": "9bdb9426-afb6-11ed-9bd8-0242ac110002",

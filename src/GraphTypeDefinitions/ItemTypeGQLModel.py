@@ -3,10 +3,13 @@ import typing
 import datetime
 import uuid
 
-from utils.Dataloaders import getLoadersFromInfo, getUserFromInfo
+from typing import Annotated
+
+from uoishelpers.resolvers import getLoadersFromInfo, getUserFromInfo
+
 from .BaseGQLModel import BaseGQLModel
 from ._GraphPermissions import RoleBasedPermission, OnlyForAuthentized
-from GraphTypeDefinitions._GraphResolvers import (
+from ._GraphResolvers import (
     resolve_id,
     resolve_name,
     resolve_name_en,
@@ -15,21 +18,22 @@ from GraphTypeDefinitions._GraphResolvers import (
     resolve_lastchange,
     resolve_createdby,
     resolve_rbacobject,
-    createRootResolver_by_id,
+    # createRootResolver_by_id,
     # createRootResolver_by_page
 )
 
-ItemTypeGQLModel = typing.Annotated["ItemTypeGQLModel", strawberry.lazy(".ItemTypeGQLModel")]
+ItemCategoryGQLModel = Annotated["ItemCategoryGQLModel", strawberry.lazy(".ItemCategoryGQLModel")]
+ItemGQLModel = Annotated["ItemGQLModel", strawberry.lazy(".ItemGQLModel")]
 
 @strawberry.federation.type(
     keys=["id"], 
-    name="FormItemCategoryGQLModel",
-    description="""Type representing an item category"""
+    name="FormItemTypeGQLModel",
+    description="""Type representing an item type"""
 )
-class ItemCategoryGQLModel(BaseGQLModel):
+class ItemTypeGQLModel(BaseGQLModel):
     @classmethod
     def getLoader(cls, info):
-        return getLoadersFromInfo(info).itemcategories
+        return getLoadersFromInfo(info).itemtypes
     
     # @classmethod
     # async def resolve_reference(cls, info: strawberry.types.Info, id: uuid.UUID):
@@ -43,15 +47,21 @@ class ItemCategoryGQLModel(BaseGQLModel):
     createdby = resolve_createdby
     name_en = resolve_name_en
     rbacobject = resolve_rbacobject
+
+    @strawberry.field(
+        description="""Type category""",
+        permission_classes=[OnlyForAuthentized()])
+    async def category(self, info: strawberry.types.Info) -> typing.Optional["ItemCategoryGQLModel"]:
+        from .ItemCategoryGQLModel import ItemCategoryGQLModel
+        return await ItemCategoryGQLModel.resolve_reference(info=info, id=self.category_id)
     
     @strawberry.field(
-        description="Returns all type for this category",
+        description="",
         permission_classes=[OnlyForAuthentized(isList=True)])
-    async def types(self, info: strawberry.types.Info) -> typing.List["ItemTypeGQLModel"]:
-        loader = getLoadersFromInfo(info).itemtypes
-        rows = await loader.filter_by(category_id=self.id)
-        return rows   
-
+    async def items(self, info: strawberry.types.Info) -> typing.List["ItemGQLModel"]:
+        loader = getLoadersFromInfo(info).items
+        rows = await loader.filter_by(type_id=self.id)
+        return rows       
 #############################################################
 #
 # Queries
@@ -59,22 +69,23 @@ class ItemCategoryGQLModel(BaseGQLModel):
 #############################################################
 
 @strawberry.field(
-    description="Retrieves the item categories",
+    description="Retrieves the item types",
     permission_classes=[OnlyForAuthentized(isList=True)])
-async def item_category_page(
+async def item_type_page(
     self, info: strawberry.types.Info, skip: int = 0, limit: int = 10
 ) -> typing.List[ItemCategoryGQLModel]:
-    loader = getLoadersFromInfo(info).itemcategories
+    loader = getLoadersFromInfo(info).itemtypes
     result = await loader.page(skip=skip, limit=limit)
     return result
 
+
 @strawberry.field(
-    description="Retrieves the item category",
+    description="Retrieves the item type",
     permission_classes=[OnlyForAuthentized()])
-async def item_category_by_id(
+async def item_type_by_id(
     self, info: strawberry.types.Info, id: uuid.UUID
-) -> typing.Optional[ItemCategoryGQLModel]:
-    result = await ItemCategoryGQLModel.resolve_reference(info=info, id=id)
+) -> typing.Optional[ItemTypeGQLModel]:
+    result = await ItemTypeGQLModel.resolve_reference(info=info, id=id)
     return result
 
 #############################################################
@@ -85,52 +96,54 @@ async def item_category_by_id(
 
 
 @strawberry.input(description="Input structure - C operation")
-class FormItemCategoryInsertGQLModel:
-    name: str = strawberry.field(description="Item category name")
+class FormItemTypeInsertGQLModel:
+    name: str = strawberry.field(description="Item type name")
     id: typing.Optional[uuid.UUID] = strawberry.field(description="primary key (UUID), could be client generated", default=None)
     createdby: strawberry.Private[uuid.UUID] = None 
 
 @strawberry.input(description="Input structure - U operation")
-class FormItemCategoryUpdateGQLModel:
-    lastchange: datetime.datetime = strawberry.field(description="timestamp of last change = TOKEN")
+class FormItemTypeUpdateGQLModel:
     id: uuid.UUID = strawberry.field(description="primary key (UUID), identifies object of operation")
-
-    name: typing.Optional[str] = strawberry.field(description="Item category name", default=None)
+    lastchange: datetime.datetime = strawberry.field(description="timestamp of last change = TOKEN")
+    name: typing.Optional[str] = strawberry.field(description="Item type name", default=None)
+    order: typing.Optional[int] = None
     changedby: strawberry.Private[uuid.UUID] = None
 
+
 @strawberry.type(description="Result of CU operations")
-class FormItemCategoryResultGQLModel:
+class FormItemTypeResultGQLModel:
     id: uuid.UUID = strawberry.field(description="primary key of CU operation object")
     msg: str = strawberry.field(description="""Should be `ok` if descired state has been reached, otherwise `fail`.
 For update operation fail should be also stated when bad lastchange has been entered.""")
 
     @strawberry.field(description="Object of CU operation, final version")
-    async def category(self, info: strawberry.types.Info) -> ItemCategoryGQLModel:
-        result = await ItemCategoryGQLModel.resolve_reference(info=info, id=self.id)
+    async def item_type(self, info: strawberry.types.Info) -> "ItemTypeGQLModel":
+        result = await ItemTypeGQLModel.resolve_reference(info, self.id)
         return result
 
 @strawberry.mutation(
     description="C operation",
     permission_classes=[OnlyForAuthentized()])
-async def item_category_insert(self, info: strawberry.types.Info, item_category: FormItemCategoryInsertGQLModel) -> FormItemCategoryResultGQLModel:
+async def form_item_type_insert(self, info: strawberry.types.Info, item_type: FormItemTypeInsertGQLModel) -> FormItemTypeResultGQLModel:
     user = getUserFromInfo(info)
-    item_category.createdby = uuid.UUID(user["id"])
-    loader = getLoadersFromInfo(info).itemcategories
-    row = await loader.insert(item_category)
-    result = FormItemCategoryResultGQLModel(id=row.id, msg="ok")
-    result.msg = "ok"
-    result.id = row.id
+    item_type.createdby = uuid.UUID(user["id"])
+    loader = getLoadersFromInfo(info).itemtypes
+    row = await loader.insert(item_type)
+    result = FormItemTypeResultGQLModel(msg="fail", id=None)
+    result.msg = "fail" if row is None else "ok"
+    result.id = None if row is None else row.id       
     return result
+
 
 @strawberry.mutation(
     description="U operation",
     permission_classes=[OnlyForAuthentized()])
-async def item_category_update(self, info: strawberry.types.Info, item_category: FormItemCategoryUpdateGQLModel) -> FormItemCategoryResultGQLModel:
+async def form_item_type_update(self, info: strawberry.types.Info, item_type: FormItemTypeUpdateGQLModel) -> FormItemTypeResultGQLModel:
     user = getUserFromInfo(info)
-    item_category.changedby = uuid.UUID(user["id"])
-    loader = getLoadersFromInfo(info).itemcategories
-    row = await loader.update(item_category)
-    result = FormItemCategoryResultGQLModel(id=item_category.id, msg="ok")
+    item_type.changedby = uuid.UUID(user["id"])
+    loader = getLoadersFromInfo(info).itemtypes
+    row = await loader.update(item_type)
+    result = FormItemTypeResultGQLModel(msg="fail", id=None)
     result.msg = "fail" if row is None else "ok"
-    result.id = item_category.id
-    return result   
+    result.id = item_type.id       
+    return result

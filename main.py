@@ -1,4 +1,5 @@
 from typing import Any, List
+import asyncio
 import logging
 import os
 from pydantic import BaseModel
@@ -27,7 +28,7 @@ from fastapi import FastAPI, Request, Depends
 from strawberry.fastapi import GraphQLRouter
 from contextlib import asynccontextmanager
 
-from DBDefinitions import ComposeConnectionString
+from src.DBDefinitions import ComposeConnectionString
 
 ## Zabezpecuje prvotni inicializaci DB a definovani Nahodne struktury pro "Univerzity"
 # from gql_workflow.DBFeeder import createSystemDataStructureRoleTypes, createSystemDataStructureGroupTypes
@@ -38,7 +39,7 @@ appcontext = {}
 @asynccontextmanager
 async def initEngine(app: FastAPI):
 
-    from DBDefinitions import startEngine, ComposeConnectionString
+    from src.DBDefinitions import startEngine, ComposeConnectionString
 
     connectionstring = ComposeConnectionString()
     makeDrop = os.getenv("DEMO", None) == "True"
@@ -52,15 +53,16 @@ async def initEngine(app: FastAPI):
 
     logging.info("engine started")
 
-    from utils.DBFeeder import initDB
-    await initDB(asyncSessionMaker)
+    from src.utils.DBFeeder import initDB
+    task = asyncio.create_task(initDB(asyncSessionMaker))
+    # await initDB(asyncSessionMaker)
 
-    logging.info("data (if any) imported")
+    # logging.info("data (if any) imported")
     yield
 
 
-from GraphTypeDefinitions import schema
-from utils.sentinel import sentinel
+from src.GraphTypeDefinitions import schema
+from src.utils.sentinel import sentinel
 
 async def get_context(request: Request):
     asyncSessionMaker = appcontext.get("asyncSessionMaker", None)
@@ -112,8 +114,6 @@ app.include_router(graphql_app, prefix="/gql2")
 @app.get("/gql")
 async def graphiql(request: Request):
     return await graphql_app.render_graphql_ide(request)
-
-from utils.sentinel import sentinel
 
 @app.post("/gql")
 async def apollo_gql(request: Request, item: Item):

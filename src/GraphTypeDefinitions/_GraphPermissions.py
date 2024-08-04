@@ -185,7 +185,7 @@ rolelist = [
 #     pass
 
 import requests
-from utils.gql_ug_proxy import createProxy
+from src.utils.gql_ug_proxy import createProxy
 
 def ReadAllRoles():
     GQLUG_ENDPOINT_URL = os.environ.get("GQLUG_ENDPOINT_URL", None)
@@ -272,14 +272,14 @@ def RolesToList(roles: str = ""):
     roleIdsNeeded = list(map(lambda roleName: roleIndex[roleName], roleNames))
     return roleIdsNeeded
 
-from utils.Dataloaders import getLoadersFromInfo
+from src.utils.Dataloaders import getLoadersFromInfo
 # from ._RBACObjectGQLModel import RBACObjectGQLModel
 
 # async def resolveRoles(info, id):
 #     return []
 
-from utils.Dataloaders import getUgConnection, getLoadersFromInfo
-from utils.Dataloaders import getUserFromInfo
+from src.utils.Dataloaders import getUgConnection, getLoadersFromInfo
+from src.utils.Dataloaders import getUserFromInfo
 
 
 @cache

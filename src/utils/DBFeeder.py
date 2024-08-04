@@ -1,11 +1,12 @@
 import datetime
+import logging
 from functools import cache
 
 # from gql_workflow.DBDefinitions import BaseModel, UserModel, GroupModel, RoleTypeModel
 # import the base model, when appolo sever ask your container for the first time, gql will ask
 # next step define some resolver, how to use resolver in the file graptype
 # check all data strcture in database if it have -- (work)
-from DBDefinitions import (
+from src.DBDefinitions import (
     FormCategoryModel,
     FormTypeModel,
     ItemTypeModel,
@@ -85,4 +86,5 @@ async def initDB(asyncSessionMaker):
         
     jsonData = get_demodata()
     await ImportModels(asyncSessionMaker, dbModels, jsonData)
+    logging.info("data (if any) imported")
     pass
