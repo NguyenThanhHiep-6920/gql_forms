@@ -1,0 +1,16 @@
+query ($id: UUID!) {
+  result: groupById(id: $id) {
+    ...GroupModel
+  }
+}
+
+fragment GroupModel on GroupGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  nameEn
+  rbacobject {
+    id
+  }
+}

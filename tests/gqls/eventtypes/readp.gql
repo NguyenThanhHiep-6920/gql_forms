@@ -1,0 +1,16 @@
+query readEventTypePage($skip: Int, $limit: Int, $where: EventTypeInputFilter) { 
+    result: eventTypePage(skip: $skip, limit: $limit, where: $where) { 
+			...EventType
+    }
+}
+
+fragment EventType on EventTypeGQLModel {
+  __typename
+  lastchange
+  id
+  name
+  
+  created
+  createdby { id }
+  changedby { id } 
+}

@@ -1,0 +1,29 @@
+mutation (
+  $id: UUID, $question_id: UUID!, $user_id: UUID! ) {
+  result: answerInsert(
+    answer: {
+      id: $id, questionId: $question_id, userId: $user_id }) {
+    id
+    msg
+    result: answer {
+      ...Answer
+    }
+  }
+}
+
+fragment Answer on AnswerGQLModel {
+  __typename
+  id
+  lastchange
+
+  value
+  aswered
+  expired
+  user { id }
+  question { id name }
+  
+  created
+  createdby { id fullname }
+  changedby { id fullname }  
+  
+}

@@ -1,0 +1,18 @@
+
+mutation($id: UUID!, $lastchange: DateTime!, $name: String!, $name_en: String) {
+  result: groupCategoryUpdate(groupCategory: {id: $id, lastchange: $lastchange, name: $name, nameEn: $name_en}) {
+    id
+    msg
+    result: category {
+      ...GroupCategoryModel
+    }
+  }
+}
+
+fragment GroupCategoryModel on GroupCategoryGQLModel {
+  __typename
+    id
+    lastchange
+    name
+    nameEn
+}

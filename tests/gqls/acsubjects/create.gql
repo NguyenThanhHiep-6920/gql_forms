@@ -1,0 +1,27 @@
+
+mutation Insert(
+  $id: UUID!, $name: String!, $name_en: String, $program_id: UUID!, $group_id:UUID!
+) {
+  result: programSubjectInsert(subject: {
+    id: $id, name: $name, nameEn: $name_en, programId: $program_id, groupId: $group_id
+  }
+  ) {
+    id
+    msg
+    result: subject {
+      ...Subject
+    }
+  }  
+}
+
+fragment Subject on AcSubjectGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  nameEn
+  program { id name }
+  semesters { id order }
+  grants { id name }
+  
+}

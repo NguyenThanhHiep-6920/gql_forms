@@ -1,0 +1,23 @@
+mutation($group_id: UUID!, $planlesson_id: UUID!) {
+  result: plannedLessonGroupInsert(grouplesson: {
+    groupId: $group_id, planlessonId: $planlesson_id
+  }) {
+    id
+    msg
+    result: lesson {
+      ...Lesson
+    }
+  }
+}
+
+fragment Lesson on PlannedLessonGQLModel {
+    lastchange
+    id
+    name
+  	order
+  	length
+  	type { id name }
+    groups { id name }
+		users { id name }
+  	facilities { id name }
+}

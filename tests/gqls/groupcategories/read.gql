@@ -1,0 +1,15 @@
+query groupCategoryById($id: UUID!) {
+  result: groupCategoryById(id: $id) {
+    ...GroupCategoryModel
+  }
+}
+
+fragment GroupCategoryModel on GroupCategoryGQLModel {
+  __typename
+    id
+    lastchange
+    name
+    nameEn
+
+    rbacobject { id }
+}

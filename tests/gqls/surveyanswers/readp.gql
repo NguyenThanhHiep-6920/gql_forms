@@ -1,0 +1,22 @@
+query AnswerPage($skip: Int = 0, $limit: Int = 10, $where: AnswerInputWhereFilter) {
+  result: answerPage(skip: $skip, limit: $limit, where: $where) {
+    ...Answer
+  }
+}
+
+fragment Answer on AnswerGQLModel {
+  __typename
+  id
+  lastchange
+
+  value
+  aswered
+  expired
+  user { id }
+  question { id name }
+  
+  created
+  createdby { id fullname }
+  changedby { id fullname }  
+  
+}

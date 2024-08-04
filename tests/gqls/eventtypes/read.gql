@@ -1,0 +1,17 @@
+query readEventType($id: UUID!) { 
+    result: eventTypeById(id: $id) { 
+			...EventType
+    }
+}
+
+fragment EventType on EventTypeGQLModel {
+  __typename
+  lastchange
+  id
+  name
+  
+  created
+  createdby { id }
+  changedby { id }
+  
+}

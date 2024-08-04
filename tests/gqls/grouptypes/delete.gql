@@ -1,0 +1,6 @@
+
+mutation groupTypeDelete($id: UUID!) {
+  result: groupTypeDelete(id: $id) {
+    msg
+  }
+}

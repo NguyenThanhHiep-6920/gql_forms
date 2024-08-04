@@ -22,14 +22,15 @@ class GroupGQLModel:
 
 # from utils.Dataloaders import getLoadersFromInfo
 from uoishelpers.resolvers import getLoadersFromInfo
+from uoishelpers.gqlpermissions import RBACObjectGQLModel
 
-@strawberry.federation.type(extend=True, keys=["id"])
-class RBACObjectGQLModel:
-    id: uuid.UUID = strawberry.federation.field(external=True)
-    resolve_reference = resolve_reference
+# @strawberry.federation.type(extend=True, keys=["id"])
+# class RBACObjectGQLModel:
+#     id: uuid.UUID = strawberry.federation.field(external=True)
+#     resolve_reference = resolve_reference
 
-    @classmethod
-    async def resolve_roles(cls, info: strawberry.types.Info, id: uuid.UUID):
-        loader = getLoadersFromInfo(info).authorizations
-        authorizedroles = await loader.load(id)
-        return authorizedroles
+#     @classmethod
+#     async def resolve_roles(cls, info: strawberry.types.Info, id: uuid.UUID):
+#         loader = getLoadersFromInfo(info).authorizations
+#         authorizedroles = await loader.load(id)
+#         return authorizedroles

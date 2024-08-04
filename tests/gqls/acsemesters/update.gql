@@ -1,0 +1,24 @@
+mutation Update(
+  $id: UUID!, $lastchange: DateTime!, $order: Int, $classificationtype_id: UUID!, $credits: Int
+) {
+  result: programSemesterUpdate(semester: {
+    id: $id, lastchange: $lastchange, order: $order, classificationtypeId: $classificationtype_id, credits: $credits
+  }
+  ) {
+    id
+    msg
+    result: semester {
+      ...Semester
+    }
+  }  
+}
+
+fragment Semester on AcSemesterGQLModel {
+  __typename
+  id
+  lastchange
+  order
+  classificationType { id name } 
+  subject { id name }
+	topics { id name }  
+}

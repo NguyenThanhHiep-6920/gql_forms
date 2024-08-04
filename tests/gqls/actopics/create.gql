@@ -1,0 +1,26 @@
+mutation Insert(
+  $id: UUID!, $semester_id: UUID!, $order: Int, $name: String
+) {
+  result: programTopicInsert(topic: {
+    id: $id, semesterId: $semester_id, order: $order, name: $name}
+  ) {
+    id
+    msg
+    result: topic {
+      ...Topic
+    }
+  }  
+}
+
+fragment Topic on AcTopicGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  order
+  semester { id order }
+  lessons { id name }
+  createdby { id email }
+  changedby { id email }
+  
+}

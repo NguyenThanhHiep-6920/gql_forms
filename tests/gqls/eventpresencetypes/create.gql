@@ -1,0 +1,24 @@
+mutation createEventPresenceType($id: UUID!, $name: String!, $name_en: String!) {
+  result: eventPresenceTypeInsert(
+    presenceType: {id: $id, name: $name, nameEn: $name_en}
+  ) {
+    id
+    msg
+    result: presenceType {
+      ...EventPresenceType
+    }
+  }
+}
+
+fragment EventPresenceType on PresenceTypeGQLModel {
+  __typename
+  lastchange
+  id
+  name
+  nameEn
+  
+  created
+  createdby { id }
+  changedby { id }
+  
+}

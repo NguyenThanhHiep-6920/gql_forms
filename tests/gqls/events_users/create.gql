@@ -1,0 +1,13 @@
+mutation($id: UUID, $user_id: UUID!, $event_id: UUID!, $invitationtype_id: UUID!) {
+  result: eventUserInsert(eventUser: {
+    id: $id, userId: $user_id, eventId: $event_id, invitationtypeId: $invitationtype_id
+  }) {
+    id
+    msg
+    result: event {
+      id
+      name
+      
+    }
+  }
+}

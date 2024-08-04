@@ -1,0 +1,13 @@
+mutation($id: UUID!, $invitationtype_id: UUID, $presencetype_id: UUID, $lastchange: DateTime!) {
+  result: eventUserUpdate(eventUser: {
+    id: $id, invitationtypeId: $invitationtype_id, presencetypeId: $presencetype_id, lastchange: $lastchange
+  }) {
+    id
+    msg
+    result: event {
+      id
+      name
+      
+    }
+  }
+}

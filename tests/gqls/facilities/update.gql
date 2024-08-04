@@ -1,0 +1,14 @@
+
+mutation ($id: UUID, $lastchange: DateTime!, $facilitytype_id: UUID, $name: String!, $valid: Boolean, $master_facility_id: UUID) {
+  result: facilityUpdate(
+    facility: {id: $id, lastchange: $lastchange, name: $name, facilitytypeId: $facilitytype_id, valid: $valid, masterFacilityId: $master_facility_id}
+  ) {
+    id
+    msg
+    result: facility {
+      id
+      lastchange
+      name
+    }
+  }
+}

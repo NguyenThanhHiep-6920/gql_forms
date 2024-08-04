@@ -1,0 +1,18 @@
+query read($id: UUID!) {
+  result: acTopicById( id: $id ) {
+      ...Topic
+  }  
+}
+
+fragment Topic on AcTopicGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  order
+  semester { id order }
+  lessons { id name }
+  createdby { id email }
+  changedby { id email }
+  
+}

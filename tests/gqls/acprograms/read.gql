@@ -1,0 +1,10 @@
+
+query read($id: UUID!) {
+  result: acProgramById(id: $id) {
+    __typename
+    id
+    lastchange
+    name
+    type { id name }
+  }
+}

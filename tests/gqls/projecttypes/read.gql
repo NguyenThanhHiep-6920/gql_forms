@@ -1,0 +1,14 @@
+query readProjectType($id: UUID!) {
+  result: projectTypeById(id: $id) {
+    ...ProjectType
+  }
+}
+
+fragment ProjectType on ProjectTypeGQLModel {
+  __typename
+  id
+  lastchange
+  
+  name
+
+}

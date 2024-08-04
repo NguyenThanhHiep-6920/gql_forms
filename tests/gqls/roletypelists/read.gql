@@ -1,0 +1,20 @@
+query($id: UUID!) {
+  roleTypeListById(id: $id) {
+    ...RoleTypeListModel
+  }
+}
+
+fragment RoleTypeListModel on RoleTypeListGQLModel {
+  __typename
+  id
+#   lastchange
+  
+  roletypes {
+    id
+    name
+  }
+  
+  # created
+#   createdby { id }
+#   changedby { id }
+}

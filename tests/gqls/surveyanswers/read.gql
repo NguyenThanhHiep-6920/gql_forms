@@ -1,0 +1,23 @@
+
+query readAnswer($id: UUID!) {
+  result: answerById(id: $id) {
+    ...Answer
+  }
+}
+
+fragment Answer on AnswerGQLModel {
+  __typename
+  id
+  lastchange
+
+  value
+  aswered
+  expired
+  user { id }
+  question { id name }
+  
+  created
+  createdby { id fullname }
+  changedby { id fullname }  
+  
+}

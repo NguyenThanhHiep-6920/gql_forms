@@ -1,0 +1,17 @@
+query groupTypePage($limit: Int, $skip: Int, $where: GroupTypeInputWhereFilter) {
+  result: groupTypePage(limit: $limit, skip: $skip, where: $where) {
+    ...GroupType
+  }
+}
+
+fragment GroupType on GroupTypeGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  nameEn
+  category { id name }
+  created
+  createdby { id email }
+  changedby { id email }
+}

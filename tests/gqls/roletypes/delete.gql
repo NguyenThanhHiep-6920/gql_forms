@@ -1,0 +1,5 @@
+mutation roleTypeDelete($id: UUID!) {
+  result: roleTypeDelete(id: $id) {
+    msg
+  }
+}

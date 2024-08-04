@@ -1,0 +1,20 @@
+query rbacById($id: UUID!) {
+  result: rbacById(id: $id) {
+    ...RBAC
+  }
+}
+
+fragment RBAC on RBACObjectGQLModel {
+  __typename
+  id
+
+  roles {
+    id
+    valid
+    startdate
+    enddate
+    roletype { id name }
+    user { id email }
+    group { id name }
+  }
+}

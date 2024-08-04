@@ -1,0 +1,21 @@
+
+mutation Insert(
+  $id: UUID!, $name: String!, $name_en: String, 
+  $group_id: UUID!, $licenced_group_id: UUID!, $type_id: UUID!
+) {
+  result: programInsert(program: {
+    id: $id, name: $name, nameEn: $name_en, groupId: $group_id, licencedGroupId: $licenced_group_id
+    typeId: $type_id
+  }
+  ) {
+    id
+    msg
+    result: program {
+      __typename
+      id
+      lastchange
+      name
+      type { id name }
+    }
+  }  
+}

@@ -1,0 +1,26 @@
+mutation Update(
+  $id: UUID!, $lastchange: DateTime!, $order: Int, $name: String
+) {
+  result: programTopicUpdate(topic: {
+    id: $id,  lastchange: $lastchange, order: $order, name: $name}
+  ) {
+    id
+    msg
+    result: topic {
+      ...Topic
+    }
+  }  
+}
+
+fragment Topic on AcTopicGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  order
+  semester { id order }
+  lessons { id name }
+  createdby { id email }
+  changedby { id email }
+  
+}

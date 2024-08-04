@@ -1,0 +1,17 @@
+
+mutation (
+  $id: UUID!, $lastchange: DateTime!
+  $invitationtype_id: UUID!, $presencetype_id: UUID) {
+  result: eventPresenceUpdate(
+    presence: {
+      id: $id, lastchange: $lastchange,
+      invitationtypeId: $invitationtype_id, presencetypeId: $presencetype_id }) {
+    id
+    msg
+    result: presence {
+      id
+      lastchange
+    }
+  },
+  
+}

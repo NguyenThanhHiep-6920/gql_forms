@@ -1,0 +1,12 @@
+mutation($facility_id: UUID!, $planlesson_id: UUID!) {
+  result: plannedLessonFacilityInsert (facilitylesson: {facilityId: $facility_id, planlessonId: $planlesson_id}) {
+    id
+    msg
+    result: lesson {
+      lastchange
+      id
+      name
+      facilities { id }
+    }
+  }
+}

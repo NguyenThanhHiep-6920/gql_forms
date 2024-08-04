@@ -1,0 +1,58 @@
+
+mutation Insert(
+  $id: UUID!, $name: String!, $name_en: String, 
+  $group_id: UUID!, $licenced_group_id: UUID!, $type_id: UUID!
+) {
+  result: programInsert(program: {
+    id: $id, name: $name, nameEn: $name_en, groupId: $group_id, licencedGroupId:$licenced_group_id
+    typeId: $type_id
+  }
+  ) {
+    id
+    msg
+    result: program {
+      ...program
+    }
+  }  
+}
+
+mutation Update(
+  $id: UUID!, $name: String!, $name_en: String, 
+  $lastchange: DateTime!,  $type_id: UUID!
+) {
+  result: programUpdate(program: {
+    id: $id, name: $name, nameEn: $name_en,
+    lastchange: $lastchange, typeId: $type_id
+  }
+  ) {
+    id
+    msg
+    result: program {
+      ...program
+    }
+  }  
+}
+
+query read($id: UUID!) {
+  result: acProgramById(id: $id) {
+    ...program
+  }
+}
+
+query readp($skip: Int, $limit: Int, $where: ProgramInputFilter) {
+  result: acProgramPage(skip: $skip, limit: $limit, where: $where) {
+    ...program
+  }
+}
+
+###
+fragment program on AcProgramGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  type { id name }
+  grantsGroup { id name }
+  licencedGroup { id name }
+	subjects { id name }
+}

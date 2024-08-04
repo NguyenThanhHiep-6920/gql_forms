@@ -1,0 +1,29 @@
+
+mutation (
+  $id: UUID, $type_id: UUID!, $survey_id: UUID!, $name: String! ) {
+  result: questionInsert(
+    question: {
+      id: $id, surveyId: $survey_id, typeId: $type_id, name: $name }) {
+    id
+    msg
+    result: question {
+      ...Question
+    }
+  }
+}
+
+fragment Question on QuestionGQLModel {
+  __typename
+  id
+  lastchange
+  
+  name
+  order
+  type { id name }
+	survey { id name }
+  answers { id }
+  created
+  createdby { id fullname }
+  changedby { id fullname }  
+  
+}

@@ -1,0 +1,18 @@
+query readp($skip: Int, $limit: Int, $where: TopicInputFilter) {
+  result: acTopicPage(skip: $skip, limit: $limit, where: $where) {
+      ...Topic
+  }  
+}
+
+fragment Topic on AcTopicGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  order
+  semester { id order }
+  lessons { id name }
+  createdby { id email }
+  changedby { id email }
+  
+}

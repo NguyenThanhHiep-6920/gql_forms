@@ -1,0 +1,17 @@
+query readp($skip: Int, $limit: Int, $where: LessonInputFilter) {
+  result: acLessonPage(skip: $skip, limit: $limit, where: $where) {
+      ...Lesson
+  }  
+}
+
+fragment Lesson on AcLessonGQLModel {
+  __typename
+  id
+  lastchange
+  count
+  type { id name }
+  topic { id name }
+  createdby { id email }
+  changedby { id email }
+
+}

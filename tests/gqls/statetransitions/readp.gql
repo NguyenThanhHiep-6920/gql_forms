@@ -1,0 +1,24 @@
+query statetranstitionPage($skip: Int, $limit: Int, $where: StateTransitionWhereFilter) {
+  result: statetranstitionPage(skip: $skip, limit: $limit, where: $where) {
+    ...StateTransitionModel
+  }
+}
+
+
+fragment StateTransitionModel on StateTransitionGQLModel {
+  __typename
+  id
+  name
+  source { id name }
+  target { id name }
+  
+  lastchange
+  created
+  createdby {
+    id
+  }
+  changedby {
+    id
+  }
+  statemachine { id name }
+}

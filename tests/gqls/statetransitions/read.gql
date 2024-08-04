@@ -1,0 +1,24 @@
+query statetransitionById($id: UUID!) {
+  result: statetransitionById(id: $id) {
+    ...StateTransitionModel
+  }
+}
+
+
+fragment StateTransitionModel on StateTransitionGQLModel {
+  __typename
+  id
+  name
+  source { id name }
+  target { id name }
+  
+  lastchange
+  created
+  createdby {
+    id
+  }
+  changedby {
+    id
+  }
+  statemachine { id name }
+}

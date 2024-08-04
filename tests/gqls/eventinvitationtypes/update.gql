@@ -1,0 +1,24 @@
+mutation ($id: UUID!, $lastchange: DateTime!, $name: String!, $name_en: String) {
+  result: eventInvitationTypeUpdate(
+    invitationType: {id: $id, lastchange: $lastchange, name: $name, nameEn: $name_en}
+  ) {
+    id
+    msg
+    result:  invitationType{
+      ...EventInvitationType
+    }
+  }
+}
+
+fragment EventInvitationType on InvitationTypeGQLModel {
+  __typename
+  lastchange
+  id
+  name
+  nameEn
+  
+  created
+  createdby { id }
+  changedby { id }
+  
+}

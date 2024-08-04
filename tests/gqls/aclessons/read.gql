@@ -1,0 +1,17 @@
+query read($id: UUID!) {
+  result: acLessonById( id: $id ) {
+      ...Lesson
+  }  
+}
+
+fragment Lesson on AcLessonGQLModel {
+  __typename
+  id
+  lastchange
+  count
+  type { id name }
+  topic { id name }
+  createdby { id email }
+  changedby { id email }
+
+}

@@ -1,0 +1,14 @@
+query readp($skip: Int, $limit: Int, $where: SemesterInputFilter) {
+  result: acSemesterPage(skip: $skip, limit: $limit, where: $where) {
+    ...Semester
+  } 
+}
+
+fragment Semester on AcSemesterGQLModel {
+  __typename
+  id
+  lastchange
+  order
+  subject { id name }
+	topics { id name }  
+}

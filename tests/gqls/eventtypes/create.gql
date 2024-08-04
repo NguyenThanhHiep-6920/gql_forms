@@ -1,0 +1,23 @@
+mutation ($id: UUID!, $name: String!, $name_en: String) {
+  result: eventTypeInsert(
+    eventType: {id: $id, name: $name, nameEn: $name_en}
+  ) {
+    id
+    msg
+    result: eventType {
+      ...EventType
+    }
+  }
+}
+
+
+fragment EventType on EventTypeGQLModel {
+  __typename
+  lastchange
+  id
+  name
+  
+  created
+  createdby { id }
+  changedby { id } 
+}

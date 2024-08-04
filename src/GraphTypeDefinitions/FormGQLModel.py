@@ -250,20 +250,14 @@ For update operation fail should be also stated when bad lastchange has been ent
         return result
    
 from ._GraphPermissions import OnlyForAuthentized
+from uoishelpers.resolvers import encapsulateInsert, encapsulateUpdate, encapsulateDelete
+
 @strawberry.mutation(
     description="C operation",
     permission_classes=[OnlyForAuthentized()])
 async def form_insert(self, info: strawberry.types.Info, form: FormInsertGQLModel) -> FormResultGQLModel:
-    user = getUserFromInfo(info)
-    user_id = user["id"]
-    user_id = uuid.UUID(user_id) if isinstance(user_id, str) else user_id
-    form.createdby = user_id
-    if form.rbacobject is None:
-        form.rbacobject = user_id
-
-    loader = getLoadersFromInfo(info).forms
-    row = await loader.insert(form)
-    result = FormResultGQLModel(id=row.id, msg="ok")
+    result = FormResultGQLModel(id=form.id, msg="ok")
+    result = await encapsulateInsert(info=info, loader=FormGQLModel.getLoader(info=info), entity=form, result=result)
     return result
 
 @strawberry.mutation(

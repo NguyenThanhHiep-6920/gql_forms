@@ -1,0 +1,19 @@
+
+query readSurvey($id: UUID!) {
+  result: surveyById(id: $id) {
+    ...Survey
+  }
+}
+
+fragment Survey on SurveyGQLModel {
+  __typename
+  id
+  lastchange
+  
+  name
+	questions { id name }
+  created
+  createdby { id fullname }
+  changedby { id fullname }  
+  
+}

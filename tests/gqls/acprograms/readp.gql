@@ -1,0 +1,10 @@
+
+query readp($skip: Int, $limit: Int, $where: ProgramInputFilter) {
+  result: acProgramPage(skip: $skip, limit: $limit, where: $where) {
+    __typename
+    id
+    lastchange
+    name
+    type { id name }
+  }
+}

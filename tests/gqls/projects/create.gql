@@ -1,0 +1,32 @@
+
+mutation (
+  $id: UUID, $type_id: UUID!, $name: String!, $group_id: UUID) {
+  result: projectInsert(
+    project: {
+      id: $id, projecttypeId: $type_id, name: $name, groupId: $group_id }) {
+    id
+    msg
+    result: project {
+      ...Project
+    }
+  }
+}
+
+fragment Project on ProjectGQLModel {
+  __typename
+  id
+  lastchange
+  
+  name
+  startdate
+  enddate
+  valid
+  
+  projectType { id name }
+
+  created
+  createdby { id fullname }
+  changedby { id fullname }  
+  
+  rbacobject { id }
+}

@@ -1,0 +1,13 @@
+
+mutation ($id: UUID!, $startdate: DateTime, $enddate: DateTime, $name: String!, $type_id: UUID!, $masterevent_id: UUID) {
+  result: eventInsert(
+    event: {id: $id, startdate: $startdate, enddate: $enddate, name: $name, typeId: $type_id, mastereventId: $masterevent_id}
+  ) {
+    id
+    msg
+    result: event {
+      id
+      lastchange
+    }
+  }
+}

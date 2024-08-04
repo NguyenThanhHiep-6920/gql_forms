@@ -1,0 +1,18 @@
+query readEventPresenceType($id: UUID!) { 
+    result: eventPresenceTypeById(id: $id) { 
+			...EventPresenceType
+    }
+}
+
+fragment EventPresenceType on PresenceTypeGQLModel {
+  __typename
+  lastchange
+  id
+  name
+  nameEn
+  
+  created
+  createdby { id }
+  changedby { id }
+  
+}

@@ -1,0 +1,24 @@
+query eventPage($skip: Int, $limit: Int, $where: EventInputFilter)
+{ result: eventPage(skip: $skip, limit: $limit, where: $where) { 
+	...Event
+}}
+
+fragment Event on EventGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  startdate
+  enddate
+  mins: duration(unit: MINUTES)
+  secs: duration(unit: SECONDS)
+  hours: duration(unit: HOURS)
+  days: duration(unit: DAYS)
+  weeks: duration(unit: WEEKS)
+  description
+  placeId
+  place
+  eventType { id name }
+  masterEvent { id name }
+  subEvents { id name }
+}

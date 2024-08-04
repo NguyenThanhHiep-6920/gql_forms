@@ -1,0 +1,24 @@
+mutation Insert(
+  $id: UUID!, $subject_id: UUID!, $order: Int, $classificationtype_id: UUID!, $credits: Int
+) {
+  result: programSemesterInsert(semester: {
+    id: $id, subjectId: $subject_id, order: $order, classificationtypeId: $classificationtype_id, credits: $credits
+  }
+  ) {
+    id
+    msg
+    result: semester {
+      ...Semester
+    }
+  }  
+}
+
+fragment Semester on AcSemesterGQLModel {
+  __typename
+  id
+  lastchange
+  order
+  classificationType { id name } 
+  subject { id name }
+	topics { id name }  
+}

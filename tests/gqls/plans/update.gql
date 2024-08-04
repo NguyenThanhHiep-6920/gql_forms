@@ -1,0 +1,12 @@
+mutation($id: UUID!, $lastchange: DateTime!, $name: String) {
+  result: planUpdate(plan: {id: $id, lastchange: $lastchange, name: $name}) {
+    id
+    msg
+    result: plan {
+      id
+      lastchange
+      name
+      semester { id }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+
+mutation ($id: UUID, $facilitytype_id: UUID, $name: String!, $valid: Boolean, $master_facility_id: UUID) {
+  result: facilityInsert(
+    facility: {id: $id, name: $name, facilitytypeId: $facilitytype_id, valid: $valid, masterFacilityId: $master_facility_id}
+  ) {
+    id
+    msg
+    result: facility {
+      id
+      name
+      lastchange
+    }
+  }
+}

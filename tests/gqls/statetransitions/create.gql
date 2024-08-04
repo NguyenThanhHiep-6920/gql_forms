@@ -1,0 +1,34 @@
+mutation statetransitionInsert(
+  $id: UUID, $name: String!, $statemachine_id: UUID!,
+  $source_id: UUID!, $target_id: UUID!
+) {
+  result: statetransitionInsert(
+    statetransition: {id: $id, name: $name, statemachineId: $statemachine_id,
+      sourceId: $source_id, targetId: $target_id
+    }) {
+    id
+    msg
+    result: statetransition{
+    	...StateTransitionModel
+  	}
+    statemachine { id }
+  }
+}
+
+fragment StateTransitionModel on StateTransitionGQLModel {
+  __typename
+  id
+  name
+  source { id name }
+  target { id name }
+  
+  lastchange
+  created
+  createdby {
+    id
+  }
+  changedby {
+    id
+  }
+  statemachine { id name }
+}

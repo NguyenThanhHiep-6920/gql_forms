@@ -1,0 +1,51 @@
+mutation statemachineInsert($id: UUID, $name: String!, $name_en: String) {
+  result: statemachineInsert(
+    statemachine: {id: $id, name: $name, nameEn: $name_en}
+  ) {
+    id
+    msg
+    result: statemachine {
+      ...StatemachineModel
+    }
+  }
+}
+
+
+fragment StatemachineModel on StateMachineGQLModel {
+  __typename
+  lastchange
+  id
+  name
+  states {
+    __typename
+    id
+    name
+    sources {
+      id
+      name
+      source {
+        id
+        name
+      }
+    }
+    targets {
+      id
+      name
+      target {
+        id
+        name
+      }
+    }
+  }
+  transitions {
+    id
+    name
+  }
+  created
+  createdby {
+    id
+  }
+  changedby {
+    id
+  }
+}

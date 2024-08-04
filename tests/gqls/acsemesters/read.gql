@@ -1,0 +1,14 @@
+query read($id: UUID!) {
+  result: acSemesterById(id: $id) {
+    ...Semester
+  } 
+}
+
+fragment Semester on AcSemesterGQLModel {
+  __typename
+  id
+  lastchange
+  order
+  subject { id name }
+	topics { id name }  
+}

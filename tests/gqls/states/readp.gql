@@ -1,0 +1,22 @@
+query statePage($skip: Int, $limit: Int, $where: StateWhereFilter) {
+  result: statePage(skip: $skip, limit: $limit, where: $where) {
+    ...State
+  }
+}
+
+
+fragment State on StateGQLModel {
+  __typename
+  id
+  name
+  
+  lastchange
+  created
+  createdby {
+    id
+  }
+  changedby {
+    id
+  }
+  statemachine { id name } 
+}

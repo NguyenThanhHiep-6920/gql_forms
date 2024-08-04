@@ -1,0 +1,18 @@
+
+query readQuestionType($id: UUID!) {
+  result: questionTypeById(id: $id) {
+    ...QuestionType
+  }
+}
+
+fragment QuestionType on QuestionTypeGQLModel {
+  __typename
+  id
+  lastchange
+  
+  name
+  created
+  createdby { id fullname }
+  changedby { id fullname }  
+  
+}

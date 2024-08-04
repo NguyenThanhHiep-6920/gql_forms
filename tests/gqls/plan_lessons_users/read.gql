@@ -1,0 +1,17 @@
+query FakeReadLessonUser($id: UUID!) {
+  result: plannedLessonById(id: $id) {
+    ...Lesson
+  }
+}
+
+fragment Lesson on PlannedLessonGQLModel {
+    lastchange
+    id
+    name
+  	order
+  	length
+  	type { id name }
+    groups { id name }
+		users { id name }
+  	facilities { id name }
+}

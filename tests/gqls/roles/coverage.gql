@@ -1,0 +1,36 @@
+query RoleById($id: UUID!) {
+  result: roleById(id: $id) {
+    ...Role
+  }
+
+  roleByUser(userId: "2d9dc5ca-a4a2-11ed-b9df-0242ac120003") {
+    ...Role
+  }
+
+  rolesOnUser(userId: "2d9dc5ca-a4a2-11ed-b9df-0242ac120003") {
+    ...Role
+  }
+
+  rolesOnGroup(groupId: "2d9dcd22-a4a2-11ed-b9df-0242ac120003") {
+    ...Role
+  }
+}
+
+
+fragment Role on RoleGQLModel {
+  __typename
+  id
+  roletype { id name }
+  
+  lastchange
+  created
+  createdby {
+    id
+    email
+  }
+  changedby {
+    id
+    email
+  }
+  rbacobject { id }
+}

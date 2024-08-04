@@ -1,0 +1,8 @@
+query($limit: Int, $skip: Int, $where: GroupInputWhereFilter){
+  result: groupPage(limit: $limit, skip: $skip, where: $where) {
+    __typename
+    id
+    name
+    nameEn
+  }
+}

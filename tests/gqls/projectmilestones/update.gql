@@ -1,0 +1,23 @@
+mutation (
+  $id: UUID!, $lastchange: DateTime!, $name: String!, $startdate: DateTime, $enddate: DateTime) {
+  result: milestoneUpdate(
+    milestone: {
+      id: $id, lastchange: $lastchange, name: $name, startdate: $startdate, enddate: $enddate }) {
+    id
+    msg
+    result: milestone {
+      ...Milestone
+    }
+  }
+}
+
+fragment Milestone on MilestoneGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  startdate
+  enddate
+  project { id name }
+
+}

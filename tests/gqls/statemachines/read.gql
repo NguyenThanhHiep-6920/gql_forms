@@ -1,0 +1,44 @@
+query statemachineById($id: UUID!) {
+  result: statemachineById(id: $id) {
+    ...StatemachineModel
+  }
+}
+
+fragment StatemachineModel on StateMachineGQLModel {
+  __typename
+  lastchange
+  id
+  name
+  states {
+    __typename
+    id
+    name
+    sources {
+      id
+      name
+      source {
+        id
+        name
+      }
+    }
+    targets {
+      id
+      name
+      target {
+        id
+        name
+      }
+    }
+  }
+  transitions {
+    id
+    name
+  }
+  created
+  createdby {
+    id
+  }
+  changedby {
+    id
+  }
+}

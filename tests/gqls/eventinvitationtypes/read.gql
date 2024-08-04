@@ -1,0 +1,18 @@
+query readEventType($id: UUID!) { 
+    result: eventInvitationTypeById(id: $id) { 
+			...EventInvitationType
+    }
+}
+
+fragment EventInvitationType on InvitationTypeGQLModel {
+  __typename
+  lastchange
+  id
+  name
+  nameEn
+  
+  created
+  createdby { id }
+  changedby { id }
+  
+}

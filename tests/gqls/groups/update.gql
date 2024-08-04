@@ -1,0 +1,13 @@
+
+mutation ($id: UUID!, $lastchange: DateTime!, $grouptype_id: UUID, $mastergroup_id: UUID, $name: String!, $name_en: String) {
+  result: groupUpdate(
+    group: {id: $id, lastchange: $lastchange, name: $name, nameEn: $name_en, grouptypeId: $grouptype_id, mastergroupId: $mastergroup_id}
+  ) {
+    id
+    msg
+    result: group {
+      id
+      lastchange
+    }
+  }
+}

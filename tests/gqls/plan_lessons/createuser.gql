@@ -1,0 +1,12 @@
+mutation($user_id: UUID!, $planlesson_id: UUID!) {
+  result: plannedLessonUserInsert (userlesson: {userId: $user_id, planlessonId: $planlesson_id}) {
+    id
+    msg
+    result: lesson {
+      lastchange
+      id
+      name
+      users { id }
+    }
+  }
+}

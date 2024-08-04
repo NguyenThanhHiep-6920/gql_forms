@@ -1,0 +1,30 @@
+mutation ($id: UUID!, $lastchange: DateTime!, $type_id: UUID!, $name: String!, $group_id: UUID, $startdate: DateTime!, $valid: Boolean!, $enddate: DateTime!) {
+  result: projectUpdate(
+    project: {id: $id, lastchange: $lastchange, projecttypeId: $type_id, name: $name, groupId: $group_id, startdate: $startdate, valid: $valid, enddate: $enddate}
+  ) {
+    id
+    msg
+    result: project {
+      ...Project
+    }
+  }
+}
+
+fragment Project on ProjectGQLModel {
+  __typename
+  id
+  lastchange
+  
+  name
+  startdate
+  enddate
+  valid
+  
+  projectType { id name }
+
+  created
+  createdby { id fullname }
+  changedby { id fullname }  
+  
+  rbacobject { id }
+}

@@ -1,0 +1,10 @@
+mutation roleTypeListAddRole($roletypelist_id: UUID!, $roletype_id: UUID!) {
+  result: roleTypeListAddRole(roleTypeListId: $roletypelist_id, roleTypeId: $roletype_id){
+    id
+    msg
+    result: roleTypelist {
+        # id
+        roletypes { id }
+    }
+  }
+}

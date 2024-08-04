@@ -1,0 +1,10 @@
+query FakeReadEventGroups($id: UUID!) { 
+    result: eventById(id: $id) { 
+        __typename
+        id
+        lastchange
+        name
+        startdate
+        enddate
+    }
+}

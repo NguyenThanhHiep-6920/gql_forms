@@ -1,0 +1,20 @@
+
+mutation (
+  $id: UUID!, $lastchange: DateTime!, $name: String! ) {
+  result: surveyTypeUpdate(
+    surveytype: {
+      id: $id, lastchange: $lastchange, name: $name }) {
+    id
+    msg
+    result: surveytype {
+      ...SurveyType
+    }
+  }
+}
+
+fragment SurveyType on SurveyTypeGQLModel {
+  __typename
+  id
+  lastchange 
+  name
+}

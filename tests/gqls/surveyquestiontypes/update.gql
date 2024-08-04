@@ -1,0 +1,24 @@
+mutation (
+  $id: UUID!, $lastchange: DateTime!, $name: String! ) {
+  result: questionTypeUpdate(
+    questiontype: {
+      id: $id, lastchange: $lastchange, name: $name }) {
+    id
+    msg
+    result: questiontype {
+      ...QuestionType
+    }
+  }
+}
+
+fragment QuestionType on QuestionTypeGQLModel {
+  __typename
+  id
+  lastchange
+  
+  name
+  created
+  createdby { id fullname }
+  changedby { id fullname }  
+  
+}

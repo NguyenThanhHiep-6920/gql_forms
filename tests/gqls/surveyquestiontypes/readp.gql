@@ -1,0 +1,17 @@
+query QuestionTypePage($skip: Int = 0, $limit: Int = 10, $where: QuestionTypeInputWhereFilter) {
+  result: questionTypePage(skip: $skip, limit: $limit, where: $where) {
+    ...QuestionType
+  }
+}
+
+fragment QuestionType on QuestionTypeGQLModel {
+  __typename
+  id
+  lastchange
+  
+  name
+  created
+  createdby { id fullname }
+  changedby { id fullname }  
+  
+}

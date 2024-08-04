@@ -1,0 +1,18 @@
+query readEventPresenceTypePage($skip: Int, $limit: Int, $where: PresenceTypeInputFilter) { 
+    result: eventPresenceTypePage(skip: $skip, limit: $limit, where: $where) { 
+			...EventPresenceType
+    }
+}
+
+fragment EventPresenceType on PresenceTypeGQLModel {
+  __typename
+  lastchange
+  id
+  name
+  nameEn
+  
+  created
+  createdby { id }
+  changedby { id }
+  
+}

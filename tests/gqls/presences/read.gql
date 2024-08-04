@@ -1,0 +1,10 @@
+query presence($id: UUID!) {
+  result: eventPresenceById(id: $id) {
+    __typename
+    id
+    lastchange
+    presenceType { id name }
+    invitationType { id name }
+    user { id }
+  }
+}

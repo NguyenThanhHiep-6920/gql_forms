@@ -1,0 +1,16 @@
+query readProjectMilestone($id: UUID!) {
+  result: milestoneById(id: $id) {
+    ...Milestone
+  }
+}
+
+fragment Milestone on MilestoneGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  startdate
+  enddate
+  project { id name }
+
+}

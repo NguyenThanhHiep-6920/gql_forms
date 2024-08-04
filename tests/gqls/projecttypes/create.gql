@@ -1,0 +1,22 @@
+
+mutation (
+  $id: UUID, $category_id: UUID!, $name: String!, $name_en: String!) {
+  result: projectTypeInsert(
+    project: {
+      id: $id, name: $name, nameEn: $name_en, categoryId: $category_id }) {
+    id
+    msg
+    result: project {
+      ...ProjectType
+    }
+  }
+}
+
+fragment ProjectType on ProjectTypeGQLModel {
+  __typename
+  id
+  lastchange
+  
+  name
+
+}

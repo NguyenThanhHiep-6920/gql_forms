@@ -1,0 +1,28 @@
+query readPresenceById($id: UUID!)
+{
+  result: eventPresenceById(id: $id) {
+  	  ...EventPresence
+  }
+}
+
+fragment EventPresence on PresenceGQLModel {
+  __typename
+    id
+    lastchange
+    presenceType {
+      id
+      name
+    }
+    invitationType {
+      id
+      name
+    }
+    user { id }
+    event { 
+      id
+      name
+      startdate
+      enddate
+    }
+  
+}

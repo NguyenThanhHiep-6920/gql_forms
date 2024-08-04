@@ -1,0 +1,18 @@
+query readEventInvitationTypePage($skip: Int, $limit: Int, $where: InvitationTypeInputFilter) { 
+    result: eventInvitationTypePage(skip: $skip, limit: $limit, where: $where) { 
+			...EventInvitationType
+    }
+}
+
+fragment EventInvitationType on InvitationTypeGQLModel {
+  __typename
+  lastchange
+  id
+  name
+  nameEn
+  
+  created
+  createdby { id }
+  changedby { id }
+  
+}

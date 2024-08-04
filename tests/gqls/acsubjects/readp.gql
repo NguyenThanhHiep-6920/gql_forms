@@ -1,0 +1,17 @@
+query readp($skip: Int, $limit: Int, $where: SubjectInputFilter) {
+  result: acSubjectPage(skip: $skip, limit: $limit, where: $where) {
+    ...Subject
+  } 
+}
+
+fragment Subject on AcSubjectGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  nameEn
+  program { id name }
+  semesters { id order }
+  grants { id name }
+  
+}

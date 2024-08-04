@@ -1,0 +1,21 @@
+mutation RoleTypeInsert($id: UUID, $name: String!, $category_id: UUID!) {
+  result: roleTypeInsert(roleType: {id: $id, name: $name, categoryId: $category_id}) {
+    id
+    msg
+    result: roleType {
+    	...RoleType
+    }
+  }
+}
+
+fragment RoleType on RoleTypeGQLModel {
+	__typename
+  id
+  lastchange
+  name
+  nameEn
+  
+  created
+  createdby { id email }
+  changedby { id email }
+}

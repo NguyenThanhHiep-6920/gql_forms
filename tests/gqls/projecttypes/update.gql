@@ -1,0 +1,22 @@
+
+mutation (
+  $id: UUID!, $lastchange: DateTime!, $name: String!, $name_en: String!) {
+  result: projectTypeUpdate(
+    project: {
+      id: $id, lastchange: $lastchange, name: $name, nameEn: $name_en }) {
+    id
+    msg
+    result: project {
+      ...ProjectType
+    }
+  }
+}
+
+fragment ProjectType on ProjectTypeGQLModel {
+  __typename
+  id
+  lastchange
+  
+  name
+
+}

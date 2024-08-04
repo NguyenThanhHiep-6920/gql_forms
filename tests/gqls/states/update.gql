@@ -1,0 +1,27 @@
+mutation stateUpdate($id: UUID!, $lastchange: DateTime!, $name: String!, ) {
+  result: stateUpdate(state: {id: $id, lastchange: $lastchange, name: $name}) {
+    id
+    msg
+    result: state{
+    	...State
+  	}
+    statemachine { id }
+  }
+}
+
+
+fragment State on StateGQLModel {
+  __typename
+  id
+  name
+  
+  lastchange
+  created
+  createdby {
+    id
+  }
+  changedby {
+    id
+  }
+  statemachine { id name }
+}

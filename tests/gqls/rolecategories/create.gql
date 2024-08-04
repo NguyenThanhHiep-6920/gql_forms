@@ -1,0 +1,21 @@
+mutation RoleCategoryInsert($id: UUID, $name: String!) {
+  result: roleCategoryInsert(roleCategory: {id: $id, name: $name}) {
+    id
+    msg
+    result: roleCategory {
+    	...RoleCategory
+    }
+  }
+}
+
+fragment RoleCategory on RoleCategoryGQLModel {
+	__typename
+  id
+  lastchange
+  name
+  nameEn
+  
+  created
+  createdby { id email }
+  changedby { id email }
+}

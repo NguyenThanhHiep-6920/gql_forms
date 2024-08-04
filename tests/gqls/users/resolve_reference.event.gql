@@ -1,0 +1,53 @@
+query readUser($id: UUID!) {
+  _entities(representations: [{__typename: "UserGQLModel", id: $id}]) {
+		...UserModel
+  }
+}
+
+fragment UserModel on UserGQLModel {
+  __typename
+  id
+  events {
+    ...EventModel
+  }
+  presences {
+    ...EventPresence
+  }
+}
+
+fragment EventModel on EventGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  startdate
+  enddate
+  duration(unit: MINUTES)
+  description
+  placeId
+  eventType { id name }
+  masterEvent { id name }
+  subEvents { id name }
+}
+
+fragment EventPresence on PresenceGQLModel {
+  __typename
+    id
+    lastchange
+    presenceType {
+      id
+      name
+    }
+    invitationType {
+      id
+      name
+    }
+    user { id }
+    event { 
+      id
+      name
+      startdate
+      enddate
+    }
+  
+}

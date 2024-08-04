@@ -1,0 +1,10 @@
+query ($limit: Int, $skip: Int, $where: UserInputWhereFilter) {
+  result: userPage(limit: $limit, skip: $skip, where: $where) {
+    __typename
+    id
+    name
+    surname
+    fullname
+    email
+  }
+}

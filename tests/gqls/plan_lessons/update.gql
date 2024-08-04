@@ -1,0 +1,16 @@
+mutation($id: UUID!, $lastchange: DateTime!, $name: String!, $order: Int, $lenght: Int, $startproposal: DateTime, $topic_id: UUID) {
+  result: plannedLessonUpdate(lesson: {id: $id, lastchange: $lastchange, name: $name, order: $order, length: $lenght, startproposal: $startproposal, topicId: $topic_id}) {
+    id
+    msg
+    result: lesson {
+      id
+			name
+      lastchange
+      created
+      changedby { id }
+      createdby { id }
+      semester { id }
+      plan { id name }      
+    }
+  }
+}

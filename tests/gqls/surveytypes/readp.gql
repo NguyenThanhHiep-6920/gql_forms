@@ -1,0 +1,13 @@
+query SurveyTypePage($skip: Int = 0, $limit: Int = 10, $where: SurveyTypeInputWhereFilter) {
+  result: surveyTypePage(skip: $skip, limit: $limit, where: $where) {
+    ...SurveyType
+  }
+}
+
+
+fragment SurveyType on SurveyTypeGQLModel {
+  __typename
+  id
+  lastchange 
+  name
+}

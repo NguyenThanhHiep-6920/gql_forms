@@ -1,0 +1,16 @@
+
+mutation (
+  $id: UUID, $user_id: UUID!, $event_id: UUID!, 
+  $invitationtype_id: UUID!, $presencetype_id: UUID) {
+  result: eventPresenceInsert(
+    presence: {
+      id: $id, userId: $user_id, eventId: $event_id, 
+      invitationtypeId: $invitationtype_id, presencetypeId: $presencetype_id }) {
+    id
+    msg
+    result: presence {
+      id
+      lastchange
+    }
+  }
+}

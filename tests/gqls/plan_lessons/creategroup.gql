@@ -1,0 +1,12 @@
+mutation($group_id: UUID!, $planlesson_id: UUID!) {
+  result: plannedLessonGroupInsert (grouplesson: {groupId: $group_id, planlessonId: $planlesson_id}) {
+    id
+    msg
+    result: lesson {
+      lastchange
+      id
+      name
+      groups { id }
+    }
+  }
+}

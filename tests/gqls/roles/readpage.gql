@@ -1,0 +1,23 @@
+query RolePage($skip: Int, $limit: Int, $where: RoleInputWhereFilter) {
+  result: rolePage(skip: $skip, limit: $limit, where: $where) {
+    ...Role
+  }
+}
+
+
+fragment Role on RoleGQLModel {
+  __typename
+  id
+  roletype { id name }
+  
+  lastchange
+  created
+  createdby {
+    id
+    email
+  }
+  changedby {
+    id
+    email
+  }
+}

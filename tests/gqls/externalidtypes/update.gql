@@ -1,0 +1,12 @@
+mutation($id: UUID!, $lastchange: DateTime!, $name: String, $nameEn: String) {
+  result: externaltypeidUpdate(externaltypeid: {id: $id, lastchange: $lastchange, name: $name, nameEn: $nameEn}) {
+    id
+    msg
+    result: externaltypeid {
+      id
+      name
+      nameEn
+      lastchange
+    }
+  }
+}

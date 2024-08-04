@@ -1,0 +1,24 @@
+query project($id: UUID!) {
+  result: projectById(id: $id) {
+    ...Project
+  }
+}
+
+fragment Project on ProjectGQLModel {
+  __typename
+  id
+  lastchange
+  
+  name
+  startdate
+  enddate
+  valid
+  
+  projectType { id name }
+
+  created
+  createdby { id fullname }
+  changedby { id fullname }  
+  
+  rbacobject { id }
+}

@@ -1,0 +1,22 @@
+query StateById($id: UUID!) {
+  result: stateById(id: $id) {
+    ...State
+  }
+}
+
+
+fragment State on StateGQLModel {
+  __typename
+  id
+  name
+  
+  lastchange
+  created
+  createdby {
+    id
+  }
+  changedby {
+    id
+  }
+  statemachine { id name }
+}

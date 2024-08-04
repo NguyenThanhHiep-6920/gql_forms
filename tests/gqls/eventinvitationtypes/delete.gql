@@ -1,0 +1,5 @@
+mutation eventInvitationTypeDelete($id: UUID!) {
+  result: eventInvitationTypeDelete(id: $id) {
+    msg
+  }
+}

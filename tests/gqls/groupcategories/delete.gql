@@ -1,0 +1,6 @@
+
+mutation groupCategoryDelete($id: UUID!) {
+  result: groupCategoryDelete(id: $id) {
+    msg
+  }
+}

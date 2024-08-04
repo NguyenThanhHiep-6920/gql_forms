@@ -1,0 +1,12 @@
+mutation($id: UUID!, $name: String, $semester_id: UUID!, $masterevent_id: UUID!) {
+  result: planInsert(plan: {id: $id, name: $name, semesterId: $semester_id, mastereventId: $masterevent_id}) {
+    id
+    msg
+    result: plan {
+      id
+      lastchange
+      name
+      semester { id }
+    }
+  }
+}

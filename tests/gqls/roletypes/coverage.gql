@@ -1,0 +1,19 @@
+query RoleTypeById($id: UUID!) {
+  result: roleTypeById(id: $id) {
+    ...RoleType
+  }
+}
+
+
+fragment RoleType on RoleTypeGQLModel {
+	__typename
+  id
+  lastchange
+  name
+  nameEn
+  
+  created
+  createdby { id email }
+  changedby { id email }
+  rbacobject { id }
+}

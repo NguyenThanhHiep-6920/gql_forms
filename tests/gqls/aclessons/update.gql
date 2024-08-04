@@ -1,0 +1,26 @@
+mutation Update(
+  $id: UUID!, $lastchange: DateTime!, $count: Int, $type_id: UUID
+) {
+  result: programLessonUpdate(lesson: {
+    id: $id, lastchange: $lastchange, count: $count, typeId: $type_id
+  }
+  ) {
+    id
+    msg
+    result: lesson {
+      ...Lesson
+    }
+  }  
+}
+
+fragment Lesson on AcLessonGQLModel {
+  __typename
+  id
+  lastchange
+  count
+  type { id name }
+  topic { id name }
+  createdby { id email }
+  changedby { id email }
+
+}

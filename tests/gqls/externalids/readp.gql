@@ -1,0 +1,7 @@
+query($where: ExternalidInputWhereFilter, $limit: Int, $skip: Int) {
+  result: externalIdsPage(limit: $limit, skip: $skip, where: $where) {
+    outerId
+    innerId
+    type { id name }
+  }
+}

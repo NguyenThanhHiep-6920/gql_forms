@@ -1,0 +1,13 @@
+query groupCategoryPage($limit: Int, $skip: Int, $where: GroupCategoryInputWhereFilter) {
+  result: groupCategoryPage(limit: $limit, skip: $skip, where: $where) {
+    ...GroupCategoryModel
+  }
+}
+
+fragment GroupCategoryModel on GroupCategoryGQLModel {
+  __typename
+    id
+    lastchange
+    name
+    nameEn
+}

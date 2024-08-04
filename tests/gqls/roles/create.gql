@@ -1,0 +1,28 @@
+mutation RoleInsert($id: UUID, $roletype_id: UUID!, $user_id: UUID!, $group_id: UUID!, $startdate: DateTime, $enddate: DateTime, $valid: Boolean) {
+  result: roleInsert(
+    role: {id: $id, roletypeId: $roletype_id, userId: $user_id, groupId: $group_id, startdate: $startdate, enddate: $enddate, valid: $valid}
+  ) {
+    id
+    msg
+    result: role {
+      ...Role
+    }
+  }
+}
+
+fragment Role on RoleGQLModel {
+  __typename
+  id
+  roletype { id name }
+  
+  lastchange
+  created
+  createdby {
+    id
+    email
+  }
+  changedby {
+    id
+    email
+  }
+}

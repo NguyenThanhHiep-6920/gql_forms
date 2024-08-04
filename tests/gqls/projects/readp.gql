@@ -1,0 +1,19 @@
+
+query readSurvey($skip: Int = 0, $limit: Int = 10, $where: SurveyInputWhereFilter = {}) {
+  result: surveyPage(skip: $skip, limit: $limit, where: $where) {
+    ...Survey
+  }
+}
+
+fragment Survey on SurveyGQLModel {
+  __typename
+  id
+  lastchange
+  
+  name
+	questions { id name }
+  created
+  createdby { id fullname }
+  changedby { id fullname }  
+  
+}

@@ -1,0 +1,13 @@
+query($id: UUID!) {
+  result: planById(id: $id) {
+    __typename
+    id
+    name
+    lastchange
+    created
+    changedby { id }
+    createdby { id }
+    semester { id }
+    lessons { id name }
+  }
+}

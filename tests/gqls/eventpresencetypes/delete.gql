@@ -1,0 +1,5 @@
+mutation eventPresenceTypeDelete($id: UUID!) {
+  result: eventPresenceTypeDelete(id: $id) {
+    msg
+  }
+}

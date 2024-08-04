@@ -1,0 +1,28 @@
+query readPresencePage($skip: Int, $limit: Int, $where: PresenceInputFilter)
+{
+  result: eventPresencePage(skip: $skip, limit: $limit, where: $where) {
+  	  ...EventPresence
+  }
+}
+
+fragment EventPresence on PresenceGQLModel {
+  __typename
+    id
+    lastchange
+    presenceType {
+      id
+      name
+    }
+    invitationType {
+      id
+      name
+    }
+    user { id }
+    event { 
+      id
+      name
+      startdate
+      enddate
+    }
+  
+}

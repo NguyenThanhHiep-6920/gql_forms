@@ -1,0 +1,7 @@
+mutation roleTypeListRemoveRole($roletypelist_id: UUID!, $roletype_id: UUID!) {
+  result: roleTypeListRemoveRole(roleTypeListId: $roletypelist_id, roleTypeId: $roletype_id){
+    # id
+    msg
+    
+  }
+}

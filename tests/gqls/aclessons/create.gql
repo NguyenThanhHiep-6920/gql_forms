@@ -1,0 +1,25 @@
+mutation Insert(
+  $id: UUID!, $topic_id: UUID!, $count: Int, $type_id: UUID!
+) {
+  result: programLessonInsert(lesson: {
+    id: $id, topicId: $topic_id, count: $count, typeId: $type_id }
+  ) {
+    id
+    msg
+    result: lesson {
+      ...Lesson
+    }
+  }  
+}
+
+fragment Lesson on AcLessonGQLModel {
+  __typename
+  id
+  lastchange
+  count
+  type { id name }
+  topic { id name }
+  createdby { id email }
+  changedby { id email }
+
+}

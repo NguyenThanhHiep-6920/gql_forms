@@ -1,0 +1,21 @@
+
+mutation Update(
+  $id: UUID!, $name: String!, $name_en: String, 
+  $lastchange: DateTime!,  $type_id: UUID!
+) {
+  result: programUpdate(program: {
+    id: $id, name: $name, nameEn: $name_en,
+    lastchange: $lastchange, typeId: $type_id
+  }
+  ) {
+    id
+    msg
+    result: program {
+      __typename
+      id
+      lastchange
+      name
+      type { id name }
+    }
+  }  
+}

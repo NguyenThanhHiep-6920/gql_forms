@@ -1,0 +1,1 @@
+query($id: UUID!) { result: facilityById(id: $id) { __typename id lastchange name } }

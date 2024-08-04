@@ -1,0 +1,35 @@
+query statemachinePage($limit: Int, $skip: Int, $where: StateMachineWhereFilter){
+  result: statemachinePage(limit: $limit, skip: $skip, where: $where) {
+    __typename
+    lastchange
+    id
+    name
+    states {
+      __typename
+      id
+      name
+      sources {
+        id
+        name
+        source { id name }
+    	}
+      targets { 
+        id
+        name
+        target {
+          id
+          name
+        }
+      }
+    
+    }
+    transitions {
+      id
+      name
+    }
+    
+    created
+    createdby { id }
+    changedby { id }
+  }
+}

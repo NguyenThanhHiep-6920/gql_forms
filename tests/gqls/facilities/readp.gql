@@ -1,0 +1,8 @@
+query($skip: Int, $limit: Int, $where: FacilityInputFilter) {
+    result: facilityPage(skip: $skip, limit: $limit, where: $where) {
+      id
+      name
+      lastchange
+      type {id name }
+    }
+}

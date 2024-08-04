@@ -1,0 +1,9 @@
+query ($id: UUID!) {
+  result: externalidtypeById(id: $id) {
+    __typename
+    id
+    name
+    nameEn
+    lastchange
+  }
+}
