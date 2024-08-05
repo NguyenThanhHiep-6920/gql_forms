@@ -13,8 +13,8 @@ import pytest_asyncio
 def uuid1():
     return f"{uuid()}"
 
-# serversTestscope = "session"
-serversTestscope = "function"
+serversTestscope = "session"
+# serversTestscope = "function"
 
 @pytest.fixture
 def DBModels():
@@ -46,18 +46,17 @@ def DBModels():
             HistoryModel
         ]
 
-from utils.DBFeeder import get_demodata
+from src.utils.DBFeeder import get_demodata
 @pytest.fixture(scope=serversTestscope)
 def DemoData():
     return get_demodata()
-
 
 @pytest_asyncio.fixture
 async def Async_Session_Maker(DBModels):
     from sqlalchemy.ext.asyncio import create_async_engine
     from sqlalchemy.ext.asyncio import AsyncSession
     from sqlalchemy.orm import sessionmaker
-    from DBDefinitions import BaseModel
+    from src.DBDefinitions import BaseModel
     asyncEngine = create_async_engine("sqlite+aiosqlite:///:memory:")
     # asyncEngine = create_async_engine("sqlite+aiosqlite:///data.sqlite")
     async with asyncEngine.begin() as conn:
@@ -85,12 +84,12 @@ async def SQLite(Async_Session_Maker, DemoData, DBModels):
 
 @pytest.fixture
 def LoadersContext(SQLite):
-    from utils.Dataloaders import createLoadersContext
+    from src.Dataloaders import createLoadersContext
     context = createLoadersContext(SQLite)
     return context
 
 @pytest.fixture
-def Request(AuthorizationHeaders):
+def Request(AuthorizationHeaders, AccessToken):
     class Request:
         @property
         def headers(self):
@@ -99,11 +98,16 @@ def Request(AuthorizationHeaders):
         def cookies(self):
             return AuthorizationHeaders
         
+        @property
+        @functools.cache
+        def scope(self):
+            return {"jwt": AccessToken}
+        
     return Request()
 
 @pytest.fixture
 def Context(AdminUser, SQLite, LoadersContext, Request):
-    from utils.gql_ug_proxy import get_ug_connection
+    # from src.gql_ug_proxy import get_ug_connection
     
     Async_Session_Maker = SQLite
     return {
@@ -112,16 +116,16 @@ def Context(AdminUser, SQLite, LoadersContext, Request):
         "": Async_Session_Maker,
         "user": AdminUser,
         "x": "",
-        "ug_connection": get_ug_connection
+        # "ug_connection": get_ug_connection
     }
 
-@pytest.fixture
-def Request():
-    class _Request():
-        @property
-        def headers(self):
-            return {"Authorization": "Bearer 2d9dc5ca-a4a2-11ed-b9df-0242ac120003"}
-    return _Request()
+# @pytest.fixture
+# def Request():
+#     class _Request():
+#         @property
+#         def headers(self):
+#             return {"Authorization": "Bearer 2d9dc5ca-a4a2-11ed-b9df-0242ac120003"}
+#     return _Request()
 
 @pytest.fixture
 def Info(Request, Context):
@@ -168,8 +172,9 @@ def QueriesFile():
         file.close()
 
 @pytest.fixture
-def DemoTrue(monkeypatch):
+def DemoTrue():
     print("setting env DEMO to True")
+    monkeypatch = pytest.MonkeyPatch()
     monkeypatch.setenv("DEMO", "True")
     # import main
     # main.DEMO = True
@@ -177,8 +182,9 @@ def DemoTrue(monkeypatch):
     print("end of setting env DEMO to True")
 
 @pytest.fixture
-def DemoFalse(monkeypatch):
+def DemoFalse():
     print("setting env DEMO to False")
+    monkeypatch = pytest.MonkeyPatch()
     monkeypatch.setenv("DEMO", "False")
     # import main
     # main.DEMO = True
@@ -187,7 +193,7 @@ def DemoFalse(monkeypatch):
 
 @pytest.fixture
 def SchemaExecutor(SQLite, Info):
-    from GraphTypeDefinitions import schema
+    from src.GraphTypeDefinitions import schema
     async def Execute(query, variable_values={}):
         result = await schema.execute(query=query, variable_values=variable_values, context_value=Info.context)
         value = {"data": result.data} 
@@ -208,28 +214,28 @@ def AdminUser(DemoData):
     user = users[0]
     return {**user, "id": f'{user["id"]}'}
 
-@pytest.fixture
+@pytest.fixture(scope=serversTestscope)
 def University(DemoData):
     groups = DemoData["groups"]
     group = next(filter(lambda g: g.get("mastergroup_id", None) is None, groups), None)
     assert group is not None, "group University not found"
     return {**group}
 
-@pytest.fixture
+@pytest.fixture(scope=serversTestscope)
 def RoleTypes(DemoData):
     roletypes = DemoData["roletypes"]
     return roletypes
 
-@pytest.fixture
+@pytest.fixture(scope=serversTestscope)
 def AllRoleResponse(RoleTypes, AdminUser, University):
     roletypes = RoleTypes
     allRoles = [
-        {"user": {**AdminUser}, "group": {**University}, "roletype": {**r}}
+        {"user": {**AdminUser}, "group": {**University}, "type": {**r}}
         for r in roletypes
     ]
 
     otherroles = [
-        {"user": {"id": uuid1()}, "group": {"id": uuid1()}, "roletype": random.choice(roletypes)}
+        {"user": {"id": uuid1()}, "group": {"id": uuid1()}, "type": random.choice(roletypes)}
         for i in range(10)
         ]
 
@@ -239,13 +245,19 @@ def AllRoleResponse(RoleTypes, AdminUser, University):
     ]}}}
 
     # print("createRoleResponse.result", response)
-    return response
+    result = {
+        "query($limit: Int) {roles: roleTypePage(limit: $limit) {id, name, nameEn}}": {"data": {"roletypes": roletypes}},
+        "query me {": response,
+        "query RBAC($rbac_id: UUID!, $user_id: UUID) {": response
+    }
+    return result
 
-@pytest.fixture
+
+@pytest.fixture(scope=serversTestscope)
 def NoRoleResponse(RoleTypes):
     roletypes = RoleTypes
     otherroles = [
-        {"user": {"id": uuid1()}, "group": {"id": uuid1()}, "roletype": random.choice(roletypes)}
+        {"user": {"id": uuid1()}, "group": {"id": uuid1()}, "type": random.choice(roletypes)}
         for i in range(10)
         ]
 
@@ -254,10 +266,17 @@ def NoRoleResponse(RoleTypes):
     ]}}}
     
     #print("NoRoleResponse.result", response)
-    return response
+    
+    result = {
+        "query($limit: Int) {roles: roleTypePage(limit: $limit) {id, name, nameEn}}": {"data": {"roletypes": roletypes}},
+        "query me {": response,
+        "query RBAC($rbac_id: UUID!, $user_id: UUID) {": response
+    }
+    return result
 
 @pytest.fixture
-def Env_GQLUG_ENDPOINT_URL_8123(monkeypatch):
+def Env_GQLUG_ENDPOINT_URL_8123():
+    monkeypatch = pytest.MonkeyPatch()
     monkeypatch.setenv("GQLUG_ENDPOINT_URL", "http://localhost:8123/gql")
     GQLUG_ENDPOINT_URL = os.environ.get("GQLUG_ENDPOINT_URL", None)
     assert GQLUG_ENDPOINT_URL == "http://localhost:8123/gql", "GQLUG_ENDPOINT_URL setup failed"
@@ -267,8 +286,9 @@ def Env_GQLUG_ENDPOINT_URL_8123(monkeypatch):
     return 
 
 @pytest.fixture(autouse=True) # allrole
-def Env_GQLUG_ENDPOINT_URL_8124(monkeypatch):
+def Env_GQLUG_ENDPOINT_URL_8124():
     # print(40*"GQLUG")
+    monkeypatch = pytest.MonkeyPatch()
     monkeypatch.setenv("GQLUG_ENDPOINT_URL", "http://localhost:8124/gql")
     GQLUG_ENDPOINT_URL = os.environ.get("GQLUG_ENDPOINT_URL", None)
     assert GQLUG_ENDPOINT_URL == "http://localhost:8124/gql", "GQLUG_ENDPOINT_URL setup failed"
@@ -288,9 +308,11 @@ def run(port, response):
 
     @app.post("/gql")
     async def gql_query(item: Item):
-        # print("APP queried", item.query)
-        #logging.info(f"SERVER Query {item} -> {response}")
-        return response
+        print("APP queried", item.query)
+        logging.info(f"SERVER Query {item} -> {response}")
+        querylines = item.query.split("\n")
+        queryline = querylines[0]
+        return response[queryline]
     #print("APP created for", response)
 
     uvicorn.run(app, port=port)
@@ -406,8 +428,10 @@ def runUserInfo(port, user):
 #     logging.info(f"JWTRESOLVEUSERPATHURL set to `http://localhost:{UserInfoServerPort}/oauth/userinfo`")
 #     yield from runUserInfo(UserInfoServerPort, AdminUser)
 
+# @pytest.fixture(scope="session")
 @pytest.fixture(scope=serversTestscope)
-def OAuthServer(monkeypatch, OAuthport, AdminUser):
+def OAuthServer(OAuthport, AdminUser):
+    monkeypatch = pytest.MonkeyPatch()
     monkeypatch.setenv("JWTPUBLICKEYURL", f"http://localhost:{OAuthport}/oauth/publickey") #/oauth/publickey
     logging.info(f"JWTPUBLICKEYURL set to `http://localhost:{OAuthport}/oauth/publickey`")
     UserInfoServerPort = 8126
@@ -449,11 +473,11 @@ async def AuthorizationHeaders(AccessToken):
 @pytest.fixture
 def FastAPIClient(SQLite):
     from fastapi.testclient import TestClient
-    import DBDefinitions
+    import src.DBDefinitions
 
     def ComposeCString():
         return "sqlite+aiosqlite:///:memory:"   
-    DBDefinitions.ComposeConnectionString = ComposeCString
+    src.DBDefinitions.ComposeConnectionString = ComposeCString
 
     import main
     client = TestClient(main.app, raise_server_exceptions=False)   
@@ -462,11 +486,11 @@ def FastAPIClient(SQLite):
 @pytest.fixture
 def FastAPIClient2():
     from fastapi.testclient import TestClient
-    import DBDefinitions
+    import src.DBDefinitions
 
     def ComposeCString():
         return "sqlite+aiosqlite:///:memory:"   
-    DBDefinitions.ComposeConnectionString = ComposeCString
+    src.DBDefinitions.ComposeConnectionString = ComposeCString
 
     import main
     client = TestClient(main.app, raise_server_exceptions=False)   
@@ -488,11 +512,11 @@ def FastAPIClient2():
 @pytest.fixture
 def FastAPIClient3():
     from fastapi.testclient import TestClient
-    import DBDefinitions
+    import src.DBDefinitions
 
     def ComposeCString():
         return "sqlite+aiosqlite:///:memory:"   
-    DBDefinitions.ComposeConnectionString = ComposeCString
+    src.DBDefinitions.ComposeConnectionString = ComposeCString
 
     import main
     client = TestClient(main.app, raise_server_exceptions=False)   
@@ -584,3 +608,13 @@ def ClientExecutorDemo(DemoTrue, ClientExecutor):
 @pytest.fixture
 def ClientExecutorNoDemo(DemoFalse, ClientExecutor):
     return ClientExecutor
+
+
+@pytest.fixture
+def Query():
+    def result(tablename):
+        def get_query(queryname):
+            pass
+
+        return get_query
+    return result

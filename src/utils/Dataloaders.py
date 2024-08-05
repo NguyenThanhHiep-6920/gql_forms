@@ -462,6 +462,12 @@ def getAuthorizationToken(info):
     context = info.context
     request = context.get("request", None)
     assert request is not None, "trying to get authtoken from None request"
+    return request.scope["jwt"]
+
+def getUGClient(info):
+    context = info.context
+    asyncClient = context.get("ug_async_gql_client", None)
+    return asyncClient
 
 def createLoadersContext(asyncSessionMaker):
     return {
@@ -469,10 +475,23 @@ def createLoadersContext(asyncSessionMaker):
     }
 
 def createUgConnectionContext(request):
+
+    _url = os.environ.get("GQLUG_ENDPOINT_URL", None)
+    token = request.scope["jwt"]
+    cookies = {'authorization': token}        
+    async def asyncClient(query, variables):
+        payload = {"query": query, "variables": variables}
+        async with aiohttp.ClientSession(cookies=cookies) as session:
+            async with session.post(_url, json=payload) as resp:
+                assert resp.status == 200, f"bad status ({resp.status}) during query {query} with variables {variables} to ug point ({_url}) see {resp}"
+                response = await resp.json()
+                return response
+
     from .gql_ug_proxy import get_ug_connection
     connection = get_ug_connection(request=request)
     return {
-        "ug_connection": connection
+        "ug_connection": connection,
+        "ug_async_gql_client": asyncClient
     }
 
 def getUgConnection(info):

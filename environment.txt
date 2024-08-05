@@ -1,6 +1,6 @@
 DEMO=True
 DEMODATA=True
 DEMOUSER={"id": "2d9dc5ca-a4a2-11ed-b9df-0242ac120003", "name": "John", "surname": "Newbie"}
-JWTPUBLICKEYURL=http://localhost:8000/oauth/publickey
-JWTRESOLVEUSERPATHURL=http://localhost:8000/oauth/userinfo
-GQLUG_ENDPOINT_URL=http://localhost:8000/gql
+JWTPUBLICKEYURL=http://localhost:33001/oauth/publickey
+JWTRESOLVEUSERPATHURL=http://localhost:33001/oauth/userinfo
+GQLUG_ENDPOINT_URL=http://localhost:33001/api/gql

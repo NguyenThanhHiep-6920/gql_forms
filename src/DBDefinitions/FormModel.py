@@ -23,7 +23,8 @@ class FormModel(BaseModel):
     changedby = UUIDFKey(nullable=True, comment="who's changed the entity")#Column(ForeignKey("users.id"), index=True, nullable=True)
 
     rbacobject = UUIDFKey(nullable=True, comment="user or group id, determines access")
-
+    state_id = UUIDFKey(nullable=True, comment="state of the request")
+    
     type = relationship("FormTypeModel", back_populates="forms", uselist=False)
     sections = relationship("SectionModel", back_populates="form", uselist=True)
     history = relationship("HistoryModel", back_populates="form", uselist=False)

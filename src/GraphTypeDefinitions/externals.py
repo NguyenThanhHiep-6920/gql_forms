@@ -1,5 +1,9 @@
 import strawberry
 import uuid
+import typing
+
+
+RequestGQLModel = typing.Annotated["RequestGQLModel", strawberry.lazy(".RequestGQLModel")]
 
 @classmethod
 async def resolve_reference(cls, info: strawberry.types.Info, id: uuid.UUID):
@@ -34,3 +38,17 @@ from uoishelpers.gqlpermissions import RBACObjectGQLModel
 #         loader = getLoadersFromInfo(info).authorizations
 #         authorizedroles = await loader.load(id)
 #         return authorizedroles
+
+@strawberry.federation.type(
+    extend=True, keys=["id"]
+)
+class StateGQLModel():
+    id: uuid.UUID = strawberry.federation.field(external=True)
+    resolve_reference = resolve_reference
+
+    @strawberry.field(description="requests associated with this state")
+    async def requests(self, info: strawberry.types.Info) -> typing.List["RequestGQLModel"]:
+        from .RequestGQLModel import RequestGQLModel
+        loader = RequestGQLModel.getLoader(info=info)
+        results = await loader.filter_by(state_id=self.id)
+        return results

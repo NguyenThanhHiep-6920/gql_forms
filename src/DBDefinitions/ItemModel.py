@@ -25,6 +25,7 @@ class ItemModel(BaseModel):
     changedby = UUIDFKey(nullable=True, comment="who's changed the entity")#Column(ForeignKey("users.id"), index=True, nullable=True)
 
     rbacobject = UUIDFKey(nullable=True, comment="user or group id, determines access")
-
+    state_id = UUIDFKey(nullable=True, comment="state of the request")
+    
     part = relationship("PartModel", back_populates="items", uselist=False)
     type = relationship("ItemTypeModel", back_populates="items", uselist=False)

@@ -27,6 +27,7 @@ from ._GraphPermissions import RoleBasedPermission, OnlyForAuthentized
 SectionGQLModel = Annotated["SectionGQLModel", strawberry.lazy(".SectionGQLModel")]
 FormTypeGQLModel = Annotated["FormTypeGQLModel", strawberry.lazy(".FormTypeGQLModel")]
 UserGQLModel = Annotated["UserGQLModel", strawberry.lazy(".externals")]
+StateGQLModel = Annotated["StateGQLModel", strawberry.lazy(".externals")]
 RequestGQLModel = Annotated["RequestGQLModel", strawberry.lazy(".RequestGQLModel")]
 
 FormGQLModelDescription = """
@@ -115,6 +116,16 @@ class FormGQLModel(BaseGQLModel):
             await UserGQLModel.resolve_reference(id=self.createdby)
         )
         return result
+
+    @strawberry.field(
+        description="Retrieves the user who has initiated this request",
+        permission_classes=[OnlyForAuthentized()])
+    async def state(self, info: strawberry.types.Info) -> typing.Optional["StateGQLModel"]:
+        #user = UserGQLModel(id=self.createdby)
+        from .externals import StateGQLModel
+        return await StateGQLModel.resolve_reference(info=info, id=self.state_id)
+
+    # state_id = UUIDFKey(nullable=True, comment="state of the request")
 
     @strawberry.field(
         description="Retrieves the type of form",

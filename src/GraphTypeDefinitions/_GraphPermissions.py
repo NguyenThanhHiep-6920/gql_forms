@@ -282,38 +282,39 @@ from src.utils.Dataloaders import getUgConnection, getLoadersFromInfo
 from src.utils.Dataloaders import getUserFromInfo
 
 
-@cache
-def OnlyForAuthentized(isList=False):
-    class OnlyForAuthentized(strawberry.permission.BasePermission):
-        message = "User is not authenticated"
+# @cache
+# def OnlyForAuthentized(isList=False):
+#     class OnlyForAuthentized(strawberry.permission.BasePermission):
+#         message = "User is not authenticated"
 
-        async def has_permission(
-            self, source, info: strawberry.types.Info, **kwargs
-        ) -> bool:
-            if self.isDEMO:
-                print("DEMO Enabled, not for production")
-                return True
+#         async def has_permission(
+#             self, source, info: strawberry.types.Info, **kwargs
+#         ) -> bool:
+#             if self.isDEMO:
+#                 print("DEMO Enabled, not for production")
+#                 return True
             
-            user = getUserFromInfo(info)
-            return (False if user is None else True)
-            #     return False        
-            # return True
+#             user = getUserFromInfo(info)
+#             return (False if user is None else True)
+#             #     return False        
+#             # return True
         
-        def on_unauthorized(self):
-            return ([] if isList else None)
-            #     return []
-            # else:
-            #     return None
+#         def on_unauthorized(self):
+#             return ([] if isList else None)
+#             #     return []
+#             # else:
+#             #     return None
             
-        @cached_property
-        def isDEMO(self):
-            DEMO = os.getenv("DEMO", None)
-            if DEMO == "True":
-                return True
-            else:
-                return False
+#         @cached_property
+#         def isDEMO(self):
+#             DEMO = os.getenv("DEMO", None)
+#             if DEMO == "True":
+#                 return True
+#             else:
+#                 return False
             
-    return OnlyForAuthentized
+#     return OnlyForAuthentized
+from uoishelpers.gqlpermissions import OnlyForAuthentized
 
 @cache
 def RoleBasedPermission(roles: str = "", whatreturn=[]):
@@ -398,3 +399,80 @@ def RoleBasedPermission(roles: str = "", whatreturn=[]):
 #         print("UserGDPRPermission", self)
 #         print("UserGDPRPermission", kwargs)
 #         return True
+
+
+from uoishelpers.gqlpermissions import RBACObjectGQLModel, WithRolesPermission
+from strawberry.types.base import StrawberryList
+sentinel = "ea3afa47-3fc4-4d50-8b76-65e3d54cce01"
+def RoleBasedPermissionUpdate(roles: str, GQLModel):
+    roleNames = roles.split(";")
+    roleNames = list(map(lambda rolename: rolename.strip(), roleNames))
+    class RoleBasedPermissionResult(WithRolesPermission):
+        def on_unauthorized(self) -> None:
+            return self.defaultResult
+        
+        async def has_permission(
+                self, source: Any, info: strawberry.types.Info, **kwargs: Any
+            # self, source, info: strawberry.types.Info, **kwargs
+            # self, source, **kwargs
+        ) -> bool:
+            # return False
+            # logging.info(f"has_permission {kwargs}")
+            self.defaultResult = [] if info._field.type.__class__ == StrawberryList else None
+            loader = GQLModel.getLoader(info=info)
+            [firstParameter, *_] = kwargs.values()
+            id = getattr(firstParameter, "id", sentinel)
+            assert id != sentinel, f"During permission test on update mutation has bee found that the first parameter of resolve has no id attribute"
+            dbrow = await loader.load(id)
+            rbacobject = getattr(dbrow, "rbacobject", sentinel)
+            assert rbacobject != sentinel, f"loaded db row {dbrow} has not attribute rbacobject which is needed for permission test"
+            state_id = getattr(dbrow, "state_id", sentinel)
+            if state_id == sentinel:
+                # normal test
+                roles = RBACObjectGQLModel.resolve_user_roles_on_object(info=info, rbac_id=rbacobject)
+                roleids_needed = self.roleIdsNeeded(info=info, roleNames=roleNames)
+                firstproperrole = next(filter(lambda role: role["type"]["id"] in roleids_needed, roles), None)
+                return firstproperrole is not None
+            else:
+                # state_id we 
+                assert False, f"probably you want to use state based permission"
+                pass
+
+    return RoleBasedPermissionResult
+
+def StateBasedPermission(GQLModel, parameterName=None, readPermission=True, writePermission=False):
+    assert readPermission != writePermission, f"readPermission and writePermission have same value"
+    class StateBasedPermissionResult(WithRolesPermission):
+        def on_unauthorized(self) -> None:
+            return self.defaultResult
+        
+        async def has_permission(
+                self, source: Any, info: strawberry.types.Info, **kwargs: Any
+            # self, source, info: strawberry.types.Info, **kwargs
+            # self, source, **kwargs
+        ) -> bool:
+            # return False
+            # logging.info(f"has_permission {kwargs}")
+            self.defaultResult = [] if info._field.type.__class__ == StrawberryList else None
+            if source is None:
+                loader = GQLModel.getLoader(info=info)
+                if parameterName is None:
+                    [parameterValue, *_] = kwargs.values()
+                else:
+                    parameterValue = kwargs[parameterValue] 
+                id = getattr(parameterValue, "id", sentinel)
+                assert id != sentinel, f"It has bee found during permission test that the parameter of resolve has no id attribute"
+                dbrow = await loader.load(id)
+            else:
+                dbrow = source
+            rbacobject = getattr(dbrow, "rbacobject", sentinel)
+            assert rbacobject != sentinel, f"loaded db row {dbrow} has not attribute rbacobject which is needed for permission test"
+            state_id = getattr(dbrow, "state_id", sentinel)
+            assert state_id != sentinel, f"{dbrow} has not attribute state_id which is needed for permission resolution"
+            userRoles = await RBACObjectGQLModel.resolve_user_roles_on_object(info=info, rbac_id=rbacobject)
+            roletypes = await RBACObjectGQLModel.resolve_role_types_on_state(info=info, state_id=state_id, readPermission=readPermission, writePermission=writePermission)
+            neededRoleIds = list(map(lambda roleType: roleType["id"], roletypes))
+            appropriateRole = next(filter(lambda userRole: userRole["type"]["id"] in neededRoleIds, userRoles), None)
+            return appropriateRole is not None
+
+    return StateBasedPermissionResult

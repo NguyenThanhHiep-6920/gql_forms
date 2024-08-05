@@ -70,7 +70,7 @@ async def get_context(request: Request):
         async with initEngine(app) as cntx:
             pass
         
-    from utils.Dataloaders import createLoadersContext, createUgConnectionContext
+    from src.utils.Dataloaders import createLoadersContext, createUgConnectionContext
     context = createLoadersContext(appcontext["asyncSessionMaker"])
     i = Item(query = "")
     # i.query = ""

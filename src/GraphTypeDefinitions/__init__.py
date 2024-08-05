@@ -46,6 +46,7 @@ class Query:
         result = f"Hello {id} `{user}`"
         return result
 
+    from .RequestGQLModel import form_test_extension
 
     from .RequestGQLModel import (
         request_by_id, 
