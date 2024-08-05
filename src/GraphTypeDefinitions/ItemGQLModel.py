@@ -58,19 +58,19 @@ class ItemGQLModel(BaseGQLModel):
 
     @strawberry.field(
         description="""Item's order""",
-        permission_classes=[OnlyForAuthentized()])
+        permission_classes=[OnlyForAuthentized])
     def order(self) -> int:
         return self.order if self.order else 0
 
     @strawberry.field(
         description="""Item's value """,
-        permission_classes=[OnlyForAuthentized()])
+        permission_classes=[OnlyForAuthentized])
     def value(self) -> str:
         return self.value
 
     @strawberry.field(
         description="Retrieves the part owning the item",
-        permission_classes=[OnlyForAuthentized()])
+        permission_classes=[OnlyForAuthentized])
     async def part(self, info: strawberry.types.Info) -> typing.Optional["PartGQLModel"]:
         from .PartGQLModel import PartGQLModel
         result = await PartGQLModel.resolve_reference(info, self.part_id)
@@ -78,7 +78,7 @@ class ItemGQLModel(BaseGQLModel):
 
     @strawberry.field(
         description="Retrieves the item type",
-        permission_classes=[OnlyForAuthentized()])
+        permission_classes=[OnlyForAuthentized])
     async def type(self, info: strawberry.types.Info) -> typing.Optional["ItemTypeGQLModel"]:
         from .ItemTypeGQLModel import ItemTypeGQLModel
         result = None if self.type_id is None else await ItemTypeGQLModel.resolve_reference(info=info, id=self.type_id)
@@ -92,7 +92,7 @@ class ItemGQLModel(BaseGQLModel):
 
 @strawberry.field(
     description="Retrieves the item type",
-    permission_classes=[OnlyForAuthentized()])
+    permission_classes=[OnlyForAuthentized])
 async def item_by_id(
     self, info: strawberry.types.Info, id: uuid.UUID
 ) -> typing.Optional[ItemGQLModel]:
@@ -112,7 +112,7 @@ class FormItemWhereFilter:
 
 @strawberry.field(
     description="Retrieves the item type",
-    permission_classes=[OnlyForAuthentized(isList=True)])
+    permission_classes=[OnlyForAuthentized])
 async def item_page(
     self, info: strawberry.types.Info, skip: int = 0, limit: int = 0,
     where: typing.Optional[FormItemWhereFilter] = None
@@ -167,7 +167,7 @@ For update operation fail should be also stated when bad lastchange has been ent
 
 @strawberry.field(
     description="""Updates a section.""",
-    permission_classes=[OnlyForAuthentized()]
+    permission_classes=[OnlyForAuthentized]
 )
 async def item_update(self, info: strawberry.types.Info, item: FormItemUpdateGQLModel) -> "FormItemResultGQLModel":
     user = getUserFromInfo(info)
@@ -182,7 +182,7 @@ async def item_update(self, info: strawberry.types.Info, item: FormItemUpdateGQL
 
 @strawberry.field(
     description="""C operation""",
-    permission_classes=[OnlyForAuthentized()]
+    permission_classes=[OnlyForAuthentized]
 )
 async def item_insert(self, info: strawberry.types.Info, item: FormItemInsertGQLModel) -> "FormItemResultGQLModel":
     user = getUserFromInfo(info)

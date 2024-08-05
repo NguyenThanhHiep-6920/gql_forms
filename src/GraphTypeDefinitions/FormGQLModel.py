@@ -69,19 +69,19 @@ class FormGQLModel(BaseGQLModel):
 
     @strawberry.field(
         description="""Form's validity""",
-        permission_classes=[OnlyForAuthentized()])
+        permission_classes=[OnlyForAuthentized])
     def valid(self) -> bool:
         return self.valid
 
     @strawberry.field(
         description="""Form's status""",
-        permission_classes=[OnlyForAuthentized()])
+        permission_classes=[OnlyForAuthentized])
     def status(self) -> typing.Optional[str]:
         return self.status
 
     # @strawberry.field(
     #     description="Retrieves the sections related to this form (form has several sections), form->section->part->item",
-    #     permission_classes=[OnlyForAuthentized(isList=True)],
+    #     permission_classes=[OnlyForAuthentized],
     #     # extensions=[strawberry.permission.PermissionExtension(fail_silently=True, permissions=[RoleBasedPermission(roles="administrator")])]
     #     )
     # async def sections(
@@ -96,7 +96,7 @@ class FormGQLModel(BaseGQLModel):
 
     @strawberry.field(
         description="Retrieves the sections related to this form (form has several sections), form->section->part->item",
-        permission_classes=[OnlyForAuthentized(isList=True)],
+        permission_classes=[OnlyForAuthentized],
         )
     async def sections(
         self, info: strawberry.types.Info,
@@ -107,7 +107,7 @@ class FormGQLModel(BaseGQLModel):
 
     @strawberry.field(
         description="Retrieves the user who has initiated this request",
-        permission_classes=[OnlyForAuthentized()])
+        permission_classes=[OnlyForAuthentized])
     async def creator(self, info: strawberry.types.Info) -> typing.Optional["UserGQLModel"]:
         #user = UserGQLModel(id=self.createdby)
         from .externals import UserGQLModel
@@ -119,7 +119,7 @@ class FormGQLModel(BaseGQLModel):
 
     @strawberry.field(
         description="Retrieves the user who has initiated this request",
-        permission_classes=[OnlyForAuthentized()])
+        permission_classes=[OnlyForAuthentized])
     async def state(self, info: strawberry.types.Info) -> typing.Optional["StateGQLModel"]:
         #user = UserGQLModel(id=self.createdby)
         from .externals import StateGQLModel
@@ -129,7 +129,7 @@ class FormGQLModel(BaseGQLModel):
 
     @strawberry.field(
         description="Retrieves the type of form",
-        permission_classes=[OnlyForAuthentized()])
+        permission_classes=[OnlyForAuthentized])
     async def type(self, info: strawberry.types.Info) -> typing.Optional["FormTypeGQLModel"]:
         from .FormTypeGQLModel import FormTypeGQLModel
         result = await FormTypeGQLModel.resolve_reference(info, id=self.type_id)
@@ -137,7 +137,7 @@ class FormGQLModel(BaseGQLModel):
   
     @strawberry.field(
         description="Retrieves the type of form",
-        permission_classes=[OnlyForAuthentized()])
+        permission_classes=[OnlyForAuthentized])
     async def request(self, info: strawberry.types.Info) -> typing.Optional["RequestGQLModel"]:
         from .HistoryGQLModel import HistoryGQLModel
         loader = HistoryGQLModel.getLoader(info)
@@ -157,7 +157,7 @@ class FormGQLModel(BaseGQLModel):
 from ._GraphPermissions import OnlyForAuthentized
 @strawberry.field(
     description="Retrieves the form type",
-    permission_classes=[OnlyForAuthentized()])
+    permission_classes=[OnlyForAuthentized])
 async def form_by_id(
     self, info: strawberry.types.Info, id: uuid.UUID
 ) -> typing.Optional[FormGQLModel]:
@@ -183,7 +183,7 @@ class FormWhereFilter:
 
 # @strawberry.field(
 #     description="Retrieves the form type",
-#     permission_classes=[OnlyForAuthentized()])
+#     permission_classes=[OnlyForAuthentized])
 # async def form_page(
 #     self, info: strawberry.types.Info, skip: int = 0, limit: int = 10,
 #     where: typing.Optional[FormWhereFilter] = None
@@ -201,14 +201,14 @@ class FormWhereFilter:
 from src.DBResolvers import FormResolvers
 form_page = strawberry.field(
     description="Retrieves the form type",
-    permission_classes=[OnlyForAuthentized()],
+    permission_classes=[OnlyForAuthentized],
     resolver=FormResolvers.Page(GQLModel=FormGQLModel, WhereFilterModel=FormWhereFilter))
 
 # from ._GraphResolvers import asPage
 
 # @strawberry.field(
 #     description="Retrieves the form type",
-#     permission_classes=[OnlyForAuthentized()])
+#     permission_classes=[OnlyForAuthentized])
 # @asPage
 # async def form_page(
 #     self, info: strawberry.types.Info, skip: int = 0, limit: int = 10,
@@ -265,7 +265,7 @@ from uoishelpers.resolvers import encapsulateInsert, encapsulateUpdate, encapsul
 
 @strawberry.mutation(
     description="C operation",
-    permission_classes=[OnlyForAuthentized()])
+    permission_classes=[OnlyForAuthentized])
 async def form_insert(self, info: strawberry.types.Info, form: FormInsertGQLModel) -> FormResultGQLModel:
     result = FormResultGQLModel(id=form.id, msg="ok")
     result = await encapsulateInsert(info=info, loader=FormGQLModel.getLoader(info=info), entity=form, result=result)
@@ -273,7 +273,7 @@ async def form_insert(self, info: strawberry.types.Info, form: FormInsertGQLMode
 
 @strawberry.mutation(
     description="U operation",
-    permission_classes=[OnlyForAuthentized()])
+    permission_classes=[OnlyForAuthentized])
 async def form_update(self, info: strawberry.types.Info, form: FormUpdateGQLModel) -> FormResultGQLModel:
     user = getUserFromInfo(info)
     form.changedby = uuid.UUID(user["id"])

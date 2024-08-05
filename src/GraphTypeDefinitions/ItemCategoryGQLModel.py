@@ -47,7 +47,7 @@ class ItemCategoryGQLModel(BaseGQLModel):
     
     @strawberry.field(
         description="Returns all type for this category",
-        permission_classes=[OnlyForAuthentized(isList=True)])
+        permission_classes=[OnlyForAuthentized])
     async def types(self, info: strawberry.types.Info) -> typing.List["ItemTypeGQLModel"]:
         loader = getLoadersFromInfo(info).itemtypes
         rows = await loader.filter_by(category_id=self.id)
@@ -61,7 +61,7 @@ class ItemCategoryGQLModel(BaseGQLModel):
 
 @strawberry.field(
     description="Retrieves the item categories",
-    permission_classes=[OnlyForAuthentized(isList=True)])
+    permission_classes=[OnlyForAuthentized])
 async def item_category_page(
     self, info: strawberry.types.Info, skip: int = 0, limit: int = 10
 ) -> typing.List[ItemCategoryGQLModel]:
@@ -71,7 +71,7 @@ async def item_category_page(
 
 @strawberry.field(
     description="Retrieves the item category",
-    permission_classes=[OnlyForAuthentized()])
+    permission_classes=[OnlyForAuthentized])
 async def item_category_by_id(
     self, info: strawberry.types.Info, id: uuid.UUID
 ) -> typing.Optional[ItemCategoryGQLModel]:
@@ -112,7 +112,7 @@ For update operation fail should be also stated when bad lastchange has been ent
 
 @strawberry.mutation(
     description="C operation",
-    permission_classes=[OnlyForAuthentized()])
+    permission_classes=[OnlyForAuthentized])
 async def item_category_insert(self, info: strawberry.types.Info, item_category: FormItemCategoryInsertGQLModel) -> FormItemCategoryResultGQLModel:
     user = getUserFromInfo(info)
     item_category.createdby = uuid.UUID(user["id"])
@@ -125,7 +125,7 @@ async def item_category_insert(self, info: strawberry.types.Info, item_category:
 
 @strawberry.mutation(
     description="U operation",
-    permission_classes=[OnlyForAuthentized()])
+    permission_classes=[OnlyForAuthentized])
 async def item_category_update(self, info: strawberry.types.Info, item_category: FormItemCategoryUpdateGQLModel) -> FormItemCategoryResultGQLModel:
     user = getUserFromInfo(info)
     item_category.changedby = uuid.UUID(user["id"])

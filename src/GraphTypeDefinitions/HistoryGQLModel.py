@@ -54,7 +54,7 @@ class HistoryGQLModel(BaseGQLModel):
 
     @strawberry.field(
         description="""Request which history belongs to""",
-        permission_classes=[OnlyForAuthentized()])
+        permission_classes=[OnlyForAuthentized])
     async def request(self, info: strawberry.types.Info) -> typing.Optional["RequestGQLModel"]:
         from .RequestGQLModel import RequestGQLModel
         result = await RequestGQLModel.resolve_reference(info, self.request_id)
@@ -62,7 +62,7 @@ class HistoryGQLModel(BaseGQLModel):
 
     @strawberry.field(
         description="""History form""",
-        permission_classes=[OnlyForAuthentized()])
+        permission_classes=[OnlyForAuthentized])
     async def form(self, info: strawberry.types.Info) -> typing.Optional["FormGQLModel"]:
         from .FormGQLModel import FormGQLModel
         result = await FormGQLModel.resolve_reference(info, self.form_id)
@@ -76,7 +76,7 @@ class HistoryGQLModel(BaseGQLModel):
 #############################################################
 @strawberry.field(
     description="returns the history result by its id",
-    permission_classes=[OnlyForAuthentized()])
+    permission_classes=[OnlyForAuthentized])
 async def form_history_by_id(self, info: strawberry.types.Info, id: uuid.UUID) -> typing.Optional[HistoryGQLModel]:
     return await HistoryGQLModel.resolve_reference(info=info, id=id)
 #############################################################
@@ -116,7 +116,7 @@ For update operation fail should be also stated when bad lastchange has been ent
 
 @strawberry.mutation(
     description="C operation",
-    permission_classes=[OnlyForAuthentized()])
+    permission_classes=[OnlyForAuthentized])
 async def history_insert(self, info: strawberry.types.Info, history: HistoryInsertGQLModel) -> HistoryResultGQLModel:
     user = getUserFromInfo(info)
     history.createdby = uuid.UUID(user["id"])
@@ -129,7 +129,7 @@ async def history_insert(self, info: strawberry.types.Info, history: HistoryInse
 
 @strawberry.mutation(
     description="U operation",
-    permission_classes=[OnlyForAuthentized()])
+    permission_classes=[OnlyForAuthentized])
 async def history_update(self, info: strawberry.types.Info, history: HistoryUpdateGQLModel) -> HistoryResultGQLModel:
     user = getUserFromInfo(info)
     history.changedby = uuid.UUID(user["id"])

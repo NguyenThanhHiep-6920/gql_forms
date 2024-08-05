@@ -50,13 +50,13 @@ class SectionGQLModel(BaseGQLModel):
 
     @strawberry.field(
         description="""Section's order""",
-        permission_classes=[OnlyForAuthentized()])
+        permission_classes=[OnlyForAuthentized])
     def order(self) -> int:
         return self.order if self.order else 0
 
     @strawberry.field(
         description="Retrieves the parts related to this section",
-        permission_classes=[OnlyForAuthentized(isList=True)])
+        permission_classes=[OnlyForAuthentized])
     async def parts(self, info: strawberry.types.Info) -> typing.List["PartGQLModel"]:
         loader = getLoadersFromInfo(info).parts
         result = await loader.filter_by(section_id=self.id)
@@ -64,7 +64,7 @@ class SectionGQLModel(BaseGQLModel):
 
     @strawberry.field(
         description="Retrieves the form owing this section",
-        permission_classes=[OnlyForAuthentized()])
+        permission_classes=[OnlyForAuthentized])
     async def form(self, info: strawberry.types.Info) -> typing.Optional["FormGQLModel"]:
         from .FormGQLModel import FormGQLModel
         result = await FormGQLModel.resolve_reference(info, self.form_id)
@@ -100,7 +100,7 @@ class SectionWhereFilter:
     
 @strawberry.field(
     description="returns section from form by its id",
-    permission_classes=[OnlyForAuthentized()])
+    permission_classes=[OnlyForAuthentized])
 async def form_section_by_id(self, info: strawberry.types.Info, id: uuid.UUID) -> typing.Optional[SectionGQLModel]:
     return await SectionGQLModel.resolve_reference(info=info, id=id)
 #############################################################
@@ -144,7 +144,7 @@ For update operation fail should be also stated when bad lastchange has been ent
 
 @strawberry.mutation(
     description="C operation",
-    permission_classes=[OnlyForAuthentized()])
+    permission_classes=[OnlyForAuthentized])
 async def section_insert(self, info: strawberry.types.Info, section: SectionInsertGQLModel) -> SectionResultGQLModel:
     user = getUserFromInfo(info)
     section.createdby = uuid.UUID(user["id"])
@@ -167,7 +167,7 @@ async def section_insert(self, info: strawberry.types.Info, section: SectionInse
 
 @strawberry.mutation(
     description="U operation",
-    permission_classes=[OnlyForAuthentized()])
+    permission_classes=[OnlyForAuthentized])
 async def section_update(self, info: strawberry.types.Info, section: SectionUpdateGQLModel) -> SectionResultGQLModel:
     user = getUserFromInfo(info)
     section.changedby = uuid.UUID(user["id"])

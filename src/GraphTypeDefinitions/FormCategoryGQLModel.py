@@ -48,7 +48,7 @@ class FormCategoryGQLModel(BaseGQLModel):
 
     @strawberry.field(
         description="",
-        permission_classes=[OnlyForAuthentized(isList=True)])
+        permission_classes=[OnlyForAuthentized])
     async def form_types(self, info: strawberry.types.Info) -> typing.List[FormTypeGQLModel]:
         loader = getLoadersFromInfo(info).formtypes
         rows = await loader.filter_by(category_id=self.id)
@@ -148,7 +148,7 @@ For update operation fail should be also stated when bad lastchange has been ent
 
 @strawberry.mutation(
     description="Create a new category",
-    permission_classes=[OnlyForAuthentized()])
+    permission_classes=[OnlyForAuthentized])
 async def form_category_insert(self, info: strawberry.types.Info, form_category: FormCategoryInsertGQLModel) -> FormCategoryResultGQLModel:
     user = getUserFromInfo(info)
     form_category.createdby = uuid.UUID(user["id"])
@@ -161,7 +161,7 @@ async def form_category_insert(self, info: strawberry.types.Info, form_category:
 
 @strawberry.mutation(
     description="Update the category",
-    permission_classes=[OnlyForAuthentized()])
+    permission_classes=[OnlyForAuthentized])
 async def form_category_update(self, info: strawberry.types.Info, form_category: FormCategoryUpdateGQLModel) -> FormCategoryResultGQLModel:
     user = getUserFromInfo(info)
     form_category.changedby = uuid.UUID(user["id"])

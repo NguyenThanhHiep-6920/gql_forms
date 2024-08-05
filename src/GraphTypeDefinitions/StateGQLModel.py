@@ -50,7 +50,7 @@
 
 #     @strawberry.field(
 #         description="""Going from state""",
-#         permission_classes=[OnlyForAuthentized()])
+#         permission_classes=[OnlyForAuthentized])
 #     async def states(self, info: strawberry.types.Info) -> typing.List["StateGQLModel"]:
 #         loader = StateGQLModel.getLoader(info)
 #         results = await loader.filter_by(statemachine_id=self.id)
@@ -98,21 +98,21 @@
 
 #     @strawberry.field(
 #         description="""Going from state""",
-#         permission_classes=[OnlyForAuthentized()])
+#         permission_classes=[OnlyForAuthentized])
 #     async def source(self, info: strawberry.types.Info) -> typing.Optional["StateGQLModel"]:
 #         result = await StateGQLModel.resolve_reference(info, self.source_id)
 #         return result
     
 #     @strawberry.field(
 #         description="""Going to state""",
-#         permission_classes=[OnlyForAuthentized()])
+#         permission_classes=[OnlyForAuthentized])
 #     async def target(self, info: strawberry.types.Info) -> typing.Optional["StateGQLModel"]:
 #         result = await StateGQLModel.resolve_reference(info, self.target_id)
 #         return result
     
 #     @strawberry.field(
 #         description="""Going to state""",
-#         permission_classes=[OnlyForAuthentized()])
+#         permission_classes=[OnlyForAuthentized])
 #     async def statemachine(self, info: strawberry.types.Info) -> typing.Optional["StateMachineGQLModel"]:
 #         result = await StateMachineGQLModel.resolve_reference(info, self.statemachine_id)
 #         return result    
@@ -155,22 +155,22 @@
 
 # type_page = strawberry.field(
 #     description="",
-#     permission_classes=[OnlyForAuthentized(isList=True)],
+#     permission_classes=[OnlyForAuthentized],
 #     resolver=DBResolvers.TypeModel.PageResolver(GQLModel=TypeGQLModel, WhereFilterModel=TypeWhereFilter))
 
 # type_by_id = strawberry.field(
 #     description="",
-#     permission_classes=[OnlyForAuthentized(isList=True)],
+#     permission_classes=[OnlyForAuthentized],
 #     resolver=DBResolvers.TypeModel.ByIdResolver(GQLModel=TypeGQLModel))
 
 # category_page = strawberry.field(
 #     description="",
-#     permission_classes=[OnlyForAuthentized(isList=True)],
+#     permission_classes=[OnlyForAuthentized],
 #     resolver=DBResolvers.CategoryModel.PageResolver(GQLModel=CategoryGQLModel, WhereFilterModel=CategoryWhereFilter))
 
 # categroy_by_id = strawberry.field(
 #     description="",
-#     permission_classes=[OnlyForAuthentized(isList=True)],
+#     permission_classes=[OnlyForAuthentized],
 #     resolver=DBResolvers.CategoryModel.ByIdResolver(GQLModel=CategoryGQLModel))
 
 
@@ -207,7 +207,7 @@
 
 # @strawberry.mutation(
 #     description="C operation",
-#     permission_classes=[OnlyForAuthentized()])
+#     permission_classes=[OnlyForAuthentized])
 # async def type_insert(self, info: strawberry.types.Info, type: TypeInsertGQLModel) -> TypeResultGQLModel:
 #     return await encapsulateInsert(
 #         info=info,
@@ -218,7 +218,7 @@
 
 # @strawberry.mutation(
 #     description="U operation",
-#     permission_classes=[OnlyForAuthentized()])
+#     permission_classes=[OnlyForAuthentized])
 # async def type_update(self, info: strawberry.types.Info, type: TypeUpdateGQLModel) -> TypeResultGQLModel:
 #     return await encapsulateUpdate(
 #         info=info,
@@ -229,7 +229,7 @@
 
 # @strawberry.mutation(
 #     description="U operation",
-#     permission_classes=[OnlyForAuthentized()])
+#     permission_classes=[OnlyForAuthentized])
 # async def type_delete(self, info: strawberry.types.Info, id: uuid.UUID) -> TypeResultGQLModel:
 #     return await encapsulateDelete(
 #         info=info,
@@ -266,7 +266,7 @@
 
 # @strawberry.mutation(
 #     description="C operation",
-#     permission_classes=[OnlyForAuthentized()])
+#     permission_classes=[OnlyForAuthentized])
 # async def category_insert(self, info: strawberry.types.Info, category: CategoryInsertGQLModel) -> CategoryResultGQLModel:
 #     return await encapsulateInsert(
 #         info=info,
@@ -277,7 +277,7 @@
 
 # @strawberry.mutation(
 #     description="U operation",
-#     permission_classes=[OnlyForAuthentized()])
+#     permission_classes=[OnlyForAuthentized])
 # async def category_update(self, info: strawberry.types.Info, category: CategoryUpdateGQLModel) -> CategoryResultGQLModel:
 #     return await encapsulateUpdate(
 #         info=info,
@@ -288,7 +288,7 @@
 
 # @strawberry.mutation(
 #     description="U operation",
-#     permission_classes=[OnlyForAuthentized()])
+#     permission_classes=[OnlyForAuthentized])
 # async def category_delete(self, info: strawberry.types.Info, id: uuid.UUID) -> CategoryResultGQLModel:
 #     return await encapsulateDelete(
 #         info=info,
