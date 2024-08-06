@@ -24,6 +24,7 @@ from ._GraphResolvers import (
 
 FormGQLModel = Annotated["FormGQLModel", strawberry.lazy(".FormGQLModel")]
 RequestGQLModel = Annotated["RequestGQLModel", strawberry.lazy(".RequestGQLModel")]
+StateGQLModel = Annotated["StateGQLModel", strawberry.lazy(".externals")]
 
 @strawberry.federation.type(
     keys=["id"], 
@@ -68,6 +69,13 @@ class HistoryGQLModel(BaseGQLModel):
         result = await FormGQLModel.resolve_reference(info, self.form_id)
         return result
     
+    @strawberry.field(
+        description="State od the form",
+        permission_classes=[OnlyForAuthentized])
+    async def state(self, info: strawberry.types.Info) -> typing.Optional["StateGQLModel"]:
+        #user = UserGQLModel(id=self.createdby)
+        from .externals import StateGQLModel
+        return await StateGQLModel.resolve_reference(info=info, id=self.state_id)
 
 #############################################################
 #

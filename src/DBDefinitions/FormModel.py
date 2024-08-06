@@ -24,7 +24,7 @@ class FormModel(BaseModel):
 
     rbacobject = UUIDFKey(nullable=True, comment="user or group id, determines access")
     state_id = UUIDFKey(nullable=True, comment="state of the request")
-    
-    type = relationship("FormTypeModel", back_populates="forms", uselist=False)
-    sections = relationship("SectionModel", back_populates="form", uselist=True)
-    history = relationship("HistoryModel", back_populates="form", uselist=False)
+
+    type = relationship("FormTypeModel", back_populates="forms", uselist=False, viewonly=True)
+    sections = relationship("SectionModel", back_populates="form", uselist=True, viewonly=True)
+    history = relationship("HistoryModel", back_populates="form", uselist=False, viewonly=True)

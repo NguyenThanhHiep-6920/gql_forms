@@ -22,6 +22,7 @@ class HistoryModel(BaseModel):
     changedby = UUIDFKey(nullable=True, comment="who's changed the entity")#Column(ForeignKey("users.id"), index=True, nullable=True)
 
     rbacobject = UUIDFKey(nullable=True, comment="user or group id, determines access")
-
+    state_id = UUIDFKey(nullable=True, comment="state of the request")
+    
     form = relationship("FormModel", back_populates="history", uselist=False)
     request = relationship("RequestModel", back_populates="histories", uselist=False)

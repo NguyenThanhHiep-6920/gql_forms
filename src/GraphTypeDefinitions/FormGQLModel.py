@@ -118,7 +118,7 @@ class FormGQLModel(BaseGQLModel):
         return result
 
     @strawberry.field(
-        description="Retrieves the user who has initiated this request",
+        description="State od the form",
         permission_classes=[OnlyForAuthentized])
     async def state(self, info: strawberry.types.Info) -> typing.Optional["StateGQLModel"]:
         #user = UserGQLModel(id=self.createdby)

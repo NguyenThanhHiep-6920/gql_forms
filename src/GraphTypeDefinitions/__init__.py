@@ -160,10 +160,13 @@ class Mutation:
     form_section_update = section_update
 
     from .RequestGQLModel import (
-        form_request_insert, form_request_update
+        form_request_insert, 
+        form_request_update,
+        form_request_use_transition
     )
     form_request_insert = form_request_insert
     form_request_update = form_request_update
+    form_request_use_transition = form_request_use_transition
 
     from .FormTypeGQLModel import (
         form_type_insert, form_type_update

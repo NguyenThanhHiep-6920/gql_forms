@@ -23,5 +23,5 @@ class RequestModel(BaseModel):
     rbacobject = UUIDFKey(nullable=True, comment="user or group id, determines access", default=lambda: UUID("f8089aa6-2c4a-4746-9503-105fcc5d054c"))
     state_id = UUIDFKey(nullable=True, comment="state of the request")
 
-    histories = relationship("HistoryModel", back_populates="request", uselist=True)
-    form = relationship("FormModel", uselist=False)
+    histories = relationship("HistoryModel", back_populates="request", uselist=True, viewonly=True, lazy="selectin")
+    form = relationship("FormModel", uselist=False, viewonly=True, lazy="selectin")

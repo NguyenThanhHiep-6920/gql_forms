@@ -459,7 +459,7 @@ def StateBasedPermission(GQLModel, parameterName=None, readPermission=True, writ
                 if parameterName is None:
                     [parameterValue, *_] = kwargs.values()
                 else:
-                    parameterValue = kwargs[parameterValue] 
+                    parameterValue = kwargs[parameterName] 
                 id = getattr(parameterValue, "id", sentinel)
                 assert id != sentinel, f"It has bee found during permission test that the parameter of resolve has no id attribute"
                 dbrow = await loader.load(id)
@@ -469,10 +469,14 @@ def StateBasedPermission(GQLModel, parameterName=None, readPermission=True, writ
             assert rbacobject != sentinel, f"loaded db row {dbrow} has not attribute rbacobject which is needed for permission test"
             state_id = getattr(dbrow, "state_id", sentinel)
             assert state_id != sentinel, f"{dbrow} has not attribute state_id which is needed for permission resolution"
-            userRoles = await RBACObjectGQLModel.resolve_user_roles_on_object(info=info, rbac_id=rbacobject)
+            userRoles = await RBACObjectGQLModel.resolve_user_roles(info=info)
+            print(f"StateBasedPermission.userRoles {userRoles}", flush=True)
             roletypes = await RBACObjectGQLModel.resolve_role_types_on_state(info=info, state_id=state_id, readPermission=readPermission, writePermission=writePermission)
+            print(f"StateBasedPermission.roletypes {roletypes}", flush=True)
             neededRoleIds = list(map(lambda roleType: roleType["id"], roletypes))
+            print(f"StateBasedPermission.neededRoleIds {neededRoleIds}", flush=True)
             appropriateRole = next(filter(lambda userRole: userRole["type"]["id"] in neededRoleIds, userRoles), None)
+            print(f"StateBasedPermission.appropriateRole {appropriateRole}", flush=True)
             return appropriateRole is not None
 
     return StateBasedPermissionResult
