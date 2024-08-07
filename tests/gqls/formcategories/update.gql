@@ -1,0 +1,20 @@
+mutation formCategoryUpdate($id: UUID!, $lastchange: DateTime!, $name: String) {
+  result: formCategoryUpdate(formCategory: {id: $id, lastchange: $lastchange, name: $name}) {
+    id
+    msg
+    result: category {
+      ...FormCategoryModel
+    }
+  }
+}
+
+fragment FormCategoryModel on FormCategoryGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  created
+  createdby { id }
+  changedby { id }
+  rbacobject { id }
+}

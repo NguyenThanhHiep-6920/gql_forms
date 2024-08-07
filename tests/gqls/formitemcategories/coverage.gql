@@ -1,0 +1,17 @@
+query formItemCategoryById($skip: Int, $limit: Int, $where: FormItemCategoryWhereFilter) {
+  result: formItemCategoryPage(skip: $skip, limit: $limit, where: $where) {
+    ...FormItemCategoryModel
+  }
+}
+
+fragment FormItemCategoryModel on FormItemCategoryGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  types { id name }
+  created
+  createdby { id }
+  changedby { id }
+  rbacobject { id }
+}

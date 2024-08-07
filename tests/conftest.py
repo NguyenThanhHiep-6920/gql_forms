@@ -8,6 +8,7 @@ import uvicorn
 from pydantic import BaseModel
 from uuid import uuid1 as uuid
 import random
+import functools
 import pytest_asyncio
 
 def uuid1():
@@ -18,38 +19,43 @@ serversTestscope = "session"
 
 @pytest.fixture
 def DBModels():
-    from DBDefinitions import (
-        FormModel,
-        FormTypeModel,
+    from src.DBDefinitions import (
         FormCategoryModel,
-        PartModel,
-        SectionModel,
-        ItemModel,
-        ItemTypeModel,
+        FormTypeModel,
         ItemCategoryModel,
+        ItemTypeModel,
+        
         RequestModel,
-        HistoryModel
+        HistoryModel,
+        FormModel,
+        SectionModel,
+        PartModel,
+        
+        ItemModel
     )
     ##
     # order is important!
     ##
     return  [
-            FormModel,
-            FormTypeModel,
-            FormCategoryModel,
-            PartModel,
-            SectionModel,
-            ItemModel,
-            ItemTypeModel,
-            ItemCategoryModel,
-            RequestModel,
-            HistoryModel
+        FormCategoryModel,
+        FormTypeModel,
+        ItemCategoryModel,
+        ItemTypeModel,
+        
+        RequestModel,
+        HistoryModel,
+        FormModel,
+        SectionModel,
+        PartModel,
+        
+        ItemModel
         ]
 
 from src.utils.DBFeeder import get_demodata
 @pytest.fixture(scope=serversTestscope)
 def DemoData():
     return get_demodata()
+
 
 @pytest_asyncio.fixture
 async def Async_Session_Maker(DBModels):
@@ -84,7 +90,7 @@ async def SQLite(Async_Session_Maker, DemoData, DBModels):
 
 @pytest.fixture
 def LoadersContext(SQLite):
-    from src.Dataloaders import createLoadersContext
+    from src.utils.Dataloaders import createLoadersContext
     context = createLoadersContext(SQLite)
     return context
 
@@ -382,8 +388,11 @@ def runOauth(port):
     
     _api_process = Process(target=runOAuthServer, daemon=True, kwargs={"port": port})
     _api_process.start()
+    sleep(2)
     print(f"OAuthServer started at {port}")
     logging.info(f"OAuthServer started at {port}")
+    
+
     yield _api_process
     _api_process.terminate()
     _api_process.join()
@@ -406,6 +415,7 @@ def runUserInfoServer(port, user):
         return user
     uvicorn.run(app, port=port)
 
+from time import sleep
 def runUserInfo(port, user):
     from multiprocessing import Process
     

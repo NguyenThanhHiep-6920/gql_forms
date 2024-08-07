@@ -1,0 +1,26 @@
+query formPage($skip: Int, $limit: Int, $where: FormWhereFilter) {
+  result: formPage(skip: $skip, limit: $limit, where: $where) {
+    ...FormModel
+  }
+}
+
+
+
+fragment FormModel on FormGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  valid
+  status
+  state { id }
+  type { id name }
+  sections {
+    id name
+  }
+  request { id name }
+  created
+  createdby { id }
+  changedby { id }
+  rbacobject { id }
+}

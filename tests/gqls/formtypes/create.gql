@@ -1,0 +1,21 @@
+mutation formTypeInsert($id: UUID, $name: String!) {
+  result: formTypeInsert(formType: {id: $id, name: $name}) {
+    id
+    msg
+    result: type {
+      ...FormTypeModel
+    }
+  }
+}
+
+fragment FormTypeModel on FormTypeGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  category { id name }
+  created
+  createdby { id }
+  changedby { id }
+  rbacobject { id }
+}

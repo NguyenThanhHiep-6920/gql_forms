@@ -1,0 +1,19 @@
+query formHistoryById($id: UUID!) {
+  result: formHistoryById(id: $id) {
+    ...RequestHistoryModel
+  }
+}
+
+fragment RequestHistoryModel on RequestHistoryGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  form { id name }
+  request { id name }
+  state { id }
+  created
+  createdby { id }
+  changedby { id }
+  rbacobject { id }
+}

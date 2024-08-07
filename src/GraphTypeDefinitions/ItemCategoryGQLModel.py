@@ -58,16 +58,36 @@ class ItemCategoryGQLModel(BaseGQLModel):
 # Queries
 #
 #############################################################
+from src.DBResolvers import ItemCategoryResolvers
 
-@strawberry.field(
+from dataclasses import dataclass
+from uoishelpers.resolvers import createInputs
+
+@createInputs
+@dataclass
+class FormItemCategoryWhereFilter:
+    id: uuid.UUID
+    name: str
+    category_id: uuid.UUID
+
+
+# @strawberry.field(
+#     description="Retrieves the item categories",
+#     permission_classes=[OnlyForAuthentized])
+# async def item_category_page(
+#     self, info: strawberry.types.Info, skip: int = 0, limit: int = 10
+# ) -> typing.List[ItemCategoryGQLModel]:
+#     loader = getLoadersFromInfo(info).itemcategories
+#     result = await loader.page(skip=skip, limit=limit)
+#     return result
+
+item_category_page = strawberry.field(
     description="Retrieves the item categories",
-    permission_classes=[OnlyForAuthentized])
-async def item_category_page(
-    self, info: strawberry.types.Info, skip: int = 0, limit: int = 10
-) -> typing.List[ItemCategoryGQLModel]:
-    loader = getLoadersFromInfo(info).itemcategories
-    result = await loader.page(skip=skip, limit=limit)
-    return result
+    resolver=ItemCategoryResolvers.Page(GQLModel=ItemCategoryGQLModel, WhereFilterModel=FormItemCategoryWhereFilter),
+    permission_classes=[
+        OnlyForAuthentized
+        ]
+    )
 
 @strawberry.field(
     description="Retrieves the item category",

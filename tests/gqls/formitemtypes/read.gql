@@ -1,0 +1,17 @@
+query formItemTypeById($id: UUID!) {
+  result: formItemTypeById(id: $id) {
+    ...FormItemTypeModel
+  }
+}
+
+fragment FormItemTypeModel on FormItemTypeGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  category { id name }
+  created
+  createdby { id }
+  changedby { id }
+  rbacobject { id }
+}

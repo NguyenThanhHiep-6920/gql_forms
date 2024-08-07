@@ -1,0 +1,20 @@
+mutation formCategoryInsert($id: UUID, $name: String!) {
+  result: formCategoryInsert(formCategory: {id: $id, name: $name}) {
+    id
+    msg
+    result: category {
+      ...FormCategoryModel
+    }
+  }
+}
+
+fragment FormCategoryModel on FormCategoryGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  created
+  createdby { id }
+  changedby { id }
+  rbacobject { id }
+}

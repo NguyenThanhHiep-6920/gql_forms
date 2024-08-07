@@ -55,29 +55,47 @@ class ItemTypeGQLModel(BaseGQLModel):
         from .ItemCategoryGQLModel import ItemCategoryGQLModel
         return await ItemCategoryGQLModel.resolve_reference(info=info, id=self.category_id)
     
-    @strawberry.field(
-        description="",
-        permission_classes=[OnlyForAuthentized])
-    async def items(self, info: strawberry.types.Info) -> typing.List["ItemGQLModel"]:
-        loader = getLoadersFromInfo(info).items
-        rows = await loader.filter_by(type_id=self.id)
-        return rows       
+    # @strawberry.field(
+    #     description="",
+    #     permission_classes=[OnlyForAuthentized])
+    # async def items(self, info: strawberry.types.Info) -> typing.List["ItemGQLModel"]:
+    #     loader = getLoadersFromInfo(info).items
+    #     rows = await loader.filter_by(type_id=self.id)
+    #     return rows       
 #############################################################
 #
 # Queries
 #
 #############################################################
+from src.DBResolvers import ItemTypeResolvers
 
-@strawberry.field(
+from dataclasses import dataclass
+from uoishelpers.resolvers import createInputs
+
+@createInputs
+@dataclass
+class FormItemTypeWhereFilter:
+    id: uuid.UUID
+    name: str
+    category_id: uuid.UUID
+
+# @strawberry.field(
+#     description="Retrieves the item types",
+#     permission_classes=[OnlyForAuthentized])
+# async def item_type_page(
+#     self, info: strawberry.types.Info, skip: int = 0, limit: int = 10
+# ) -> typing.List[ItemCategoryGQLModel]:
+#     loader = getLoadersFromInfo(info).itemtypes
+#     result = await loader.page(skip=skip, limit=limit)
+#     return result
+
+item_type_page = strawberry.field(
     description="Retrieves the item types",
-    permission_classes=[OnlyForAuthentized])
-async def item_type_page(
-    self, info: strawberry.types.Info, skip: int = 0, limit: int = 10
-) -> typing.List[ItemCategoryGQLModel]:
-    loader = getLoadersFromInfo(info).itemtypes
-    result = await loader.page(skip=skip, limit=limit)
-    return result
-
+    resolver=ItemTypeResolvers.Page(GQLModel=ItemTypeGQLModel, WhereFilterModel=FormItemTypeWhereFilter),
+    permission_classes=[
+        OnlyForAuthentized
+    ]
+)
 
 @strawberry.field(
     description="Retrieves the item type",

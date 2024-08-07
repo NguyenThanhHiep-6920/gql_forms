@@ -1,0 +1,30 @@
+mutation formTypeUpdate($id: UUID!, $lastchange: DateTime!, $name: String) {
+  result: formTypeUpdate(formType: {id: $id, name: $name, lastchange: $lastchange}) {
+    id
+    msg
+    result: type {
+      ...FormTypeModel
+    }
+  }
+}
+
+fragment FormTypeModel on FormTypeGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  category {
+    id
+    name
+  }
+  created
+  createdby {
+    id
+  }
+  changedby {
+    id
+  }
+  rbacobject {
+    id
+  }
+}

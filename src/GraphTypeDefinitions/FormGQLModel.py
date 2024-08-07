@@ -105,17 +105,17 @@ class FormGQLModel(BaseGQLModel):
         results = await loader.filter_by(form_id=self.id)
         return results
 
-    @strawberry.field(
-        description="Retrieves the user who has initiated this request",
-        permission_classes=[OnlyForAuthentized])
-    async def creator(self, info: strawberry.types.Info) -> typing.Optional["UserGQLModel"]:
-        #user = UserGQLModel(id=self.createdby)
-        from .externals import UserGQLModel
-        result = (None 
-            if self.createdby is None else 
-            await UserGQLModel.resolve_reference(id=self.createdby)
-        )
-        return result
+    # @strawberry.field(
+    #     description="Retrieves the user who has initiated this request",
+    #     permission_classes=[OnlyForAuthentized])
+    # async def creator(self, info: strawberry.types.Info) -> typing.Optional["UserGQLModel"]:
+    #     #user = UserGQLModel(id=self.createdby)
+    #     from .externals import UserGQLModel
+    #     result = (None 
+    #         if self.createdby is None else 
+    #         await UserGQLModel.resolve_reference(id=self.createdby)
+    #     )
+    #     return result
 
     @strawberry.field(
         description="State od the form",
@@ -143,11 +143,10 @@ class FormGQLModel(BaseGQLModel):
         loader = HistoryGQLModel.getLoader(info)
         rows = await loader.filter_by(form_id=self.id)
         row = next(rows, None)
-        if row is None:
-            return None
+
         from .RequestGQLModel import RequestGQLModel
         result =  await RequestGQLModel.resolve_reference(info, row.request_id)
-        return result
+        return None if row is None else result
     
 #############################################################
 #
@@ -169,6 +168,7 @@ async def form_by_id(
 from dataclasses import dataclass
 from uoishelpers.resolvers import createInputs
 
+# FormTypeWhereFilter_ = typing.Annotated["FormTypeWhereFilter", strawberry.lazy(".FormTypeGQLModel")]
 @createInputs
 @dataclass
 class FormWhereFilter:

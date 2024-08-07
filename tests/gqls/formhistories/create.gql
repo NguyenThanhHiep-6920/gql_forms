@@ -1,0 +1,23 @@
+mutation formHistoryInsert($id: UUID, $request_id: UUID!, $form_id: UUID!, $name: String!) {
+  result: formHistoryInsert(history: {id: $id, requestId: $request_id, formId: $form_id name: $name}) {
+    id
+    msg
+    result: history {
+    	...RequestHistoryModel  
+    }
+  }
+}
+
+fragment RequestHistoryModel on RequestHistoryGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  form { id name }
+  request { id name }
+  state { id }
+  created
+  createdby { id }
+  changedby { id }
+  rbacobject { id }
+}

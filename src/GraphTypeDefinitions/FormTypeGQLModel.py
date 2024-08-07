@@ -80,15 +80,15 @@ async def form_type_by_id(
 from dataclasses import dataclass
 from uoishelpers.resolvers import createInputs
 
-FormWhereFilter = Annotated["FormWhereFilter", strawberry.lazy(".FormGQLModel")]
+# FormWhereFilter = Annotated["FormWhereFilter", strawberry.lazy(".FormGQLModel")]
 @createInputs
 @dataclass
 class FormTypeWhereFilter:
     name: str
     name_en: str
     id: uuid.UUID
-
-    forms: FormWhereFilter
+    # from .FormGQLModel import FormWhereFilter
+    # forms: FormWhereFilter
 
 @strawberry.field(
     description="Retrieves the form type",

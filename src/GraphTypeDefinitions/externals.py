@@ -2,6 +2,8 @@ import strawberry
 import uuid
 import typing
 
+from uoishelpers.gqlpermissions import OnlyForAuthentized
+
 
 RequestGQLModel = typing.Annotated["RequestGQLModel", strawberry.lazy(".RequestGQLModel")]
 
@@ -18,6 +20,15 @@ class UserGQLModel:
     id: uuid.UUID = strawberry.federation.field(external=True)
     resolve_reference = resolve_reference
 
+    @strawberry.mutation(
+        description="C operation",
+        permission_classes=[OnlyForAuthentized])
+    async def requests(self, info: strawberry.types.Info) -> typing.List[RequestGQLModel]:
+        from .RequestGQLModel import RequestGQLModel
+        loader = RequestGQLModel.getLoader(info=info)
+        results = await loader.filter_by(createdby=self.id)
+        return results
+        # pass
 
 @strawberry.federation.type(extend=True, keys=["id"])
 class GroupGQLModel:

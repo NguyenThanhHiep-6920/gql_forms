@@ -156,7 +156,9 @@ request_page = strawberry.field(
 @strawberry.input(description="Input structure - C operation")
 class FormRequestInsertGQLModel:
     name: str = strawberry.field(description="Request name")
-    #form_type_id: uuid.UUID = strawberry.field(description="Form type which will be initialized")
+    form__id: uuid.UUID = strawberry.field(description="id of the form which will be copied as initial form of the request")
+    state_id: uuid.UUID = strawberry.field(description="id of the request state")
+
     id: typing.Optional[uuid.UUID] = strawberry.field(description="primary key (UUID), could be client generated", default=None)
     createdby: strawberry.Private[uuid.UUID] = None 
     rbacobject: strawberry.Private[uuid.UUID] = None
@@ -186,6 +188,98 @@ For update operation fail should be also stated when bad lastchange has been ent
     async def request(self, info: strawberry.types.Info) -> RequestGQLModel:
         return await RequestGQLModel.resolve_reference(info, self.id)
 
+
+async def CopyForm(info: strawberry.types.Info, request_id: uuid.UUID, source_form_id: uuid.UUID, copy_form_id: uuid.UUID, copy_state_id: uuid.UUID, copy_item_values=False):
+    from .FormGQLModel import FormGQLModel
+    formloader = FormGQLModel.getLoader(info=info)
+    form_row = await formloader.load(source_form_id)
+    assert form_row is not None, f"Form {source_form_id} has not been found"
+
+    # copy_form = await formloader.insert(entity=form_row, extraAttributes={"id": copy_form_id, "state_id": target_id})
+    copy_form = await formloader.insert(
+        entity=None, 
+        extraAttributes={
+            "id": copy_form_id, 
+            "state_id": copy_state_id,
+            "request_id": request_id,
+            "name": form_row.name,
+            "rbacobject": form_row.rbacobject,
+            "type_id": form_row.type_id
+        })
+    print(f"copy_form {copy_form.state_id} {copy_form}({copy_form.id} / {copy_form_id})")
+    from .SectionGQLModel import SectionGQLModel
+    section_loader = SectionGQLModel.getLoader(info=info)
+    sections = await section_loader.filter_by(form_id=source_form_id)
+    sections = list(sections)
+    # print("sections", sections, flush=True)
+    section_ids = list(map(lambda section: section.id, sections))
+    # print("section_ids", section_ids, flush=True)
+    # assert len(section_ids) !=0, f"form has no sections :("
+    copy_sections = (section_loader.insert(
+        # entity=section, 
+        entity=None, 
+        extraAttributes={
+            "id": uuid.uuid1(), 
+            "form_id": copy_form_id, 
+            "state_id": copy_state_id,
+            "rbacobject": section.rbacobject,
+            "name": section.name,
+            }) for section in sections)
+    copy_sections = await asyncio.gather(*copy_sections)
+    # print("copy_sections", copy_sections, flush=True)
+    sections_map = {oldid: copy_section.id for copy_section, oldid in zip(copy_sections, section_ids)}
+    # print("sections_map", sections_map, flush=True)
+
+    from .PartGQLModel import PartGQLModel
+    part_loader = PartGQLModel.getLoader(info=info)
+    part_db_model = part_loader.getModel()
+    
+    parts_select_statement = part_loader.getSelectStatement()
+    parts_select_statement = parts_select_statement.filter(part_db_model.section_id.in_(section_ids))
+    parts = await part_loader.execute_select(parts_select_statement)
+    parts = list(parts)
+    part_ids = list(map(lambda part: part.id, parts))
+    # print("part_ids", part_ids, flush=True)
+    copy_parts = (part_loader.insert(
+        # entity=part, 
+        entity=None, 
+        extraAttributes={
+            "id": uuid.uuid1(), 
+            "section_id": sections_map[part.section_id], 
+            "state_id": copy_state_id,
+            "rbacobject": part.rbacobject,
+            "name": part.name,
+            }) for part in parts)
+    copy_parts = await asyncio.gather(*copy_parts)
+    # print("copy_parts", copy_parts, flush=True)
+    parts_map = {oldid: copy_part.id for copy_part, oldid in zip(copy_parts, part_ids)}
+    # print("parts_map", parts_map, flush=True)
+    # copy_part_ids = {id: uuid.uuid1() for id in part_ids}
+
+    from .ItemGQLModel import ItemGQLModel
+    item_loader = ItemGQLModel.getLoader(info=info)
+    item_db_model = item_loader.getModel()
+    items_select_statement = item_loader.getSelectStatement()
+    items_select_statement = items_select_statement.filter(item_db_model.part_id.in_(part_ids))
+    items = await item_loader.execute_select(items_select_statement)
+    items = list(items)
+    # item_ids = list(map(lambda item: item.id, items))
+    copy_items = (item_loader.insert(
+        # entity=item, 
+        entity=None, 
+        extraAttributes={
+            "id": uuid.uuid1(), 
+            "part_id": parts_map[item.part_id], 
+            "state_id": copy_state_id,
+            "rbacobject": item.rbacobject,
+            "name": item.name,
+            "value": item.value if copy_item_values else None,
+            "type_id": item.type_id
+            }) for item in items )
+    copy_items = await asyncio.gather(*copy_items)    
+    return copy_form
+
+
 @strawberry.mutation(
     description="C operation",
     permission_classes=[OnlyForAuthentized])
@@ -193,6 +287,17 @@ async def form_request_insert(self, info: strawberry.types.Info, request: FormRe
     user = getUserFromInfo(info)
     request.createdby = uuid.UUID(user["id"])
     request.rbacobject = uuid.UUID(user["id"])
+
+    copy_form_id = uuid.uuid1()
+    copy_form = await CopyForm(
+        info=info,
+        request_id=request.id,
+        source_form_id=request.form_id,
+        copy_form_id=copy_form_id,
+        copy_state_id=request.state_id, # TODO change this better is to use StateMachine (first/input state)
+        copy_item_values=False
+        )
+    request.form_id=copy_form_id
     loader = getLoadersFromInfo(info).requests
     row = await loader.insert(request)
     result = FormRequestResultGQLModel(id=row.id, msg="ok")
@@ -200,9 +305,14 @@ async def form_request_insert(self, info: strawberry.types.Info, request: FormRe
     result.id = row.id
     return result
 
+from ._GraphPermissions import StateBasedPermission
+
 @strawberry.mutation(
     description="U operation",
-    permission_classes=[OnlyForAuthentized])
+    permission_classes=[
+        OnlyForAuthentized,
+        StateBasedPermission(GQLModel=RequestGQLModel, parameterName="request", readPermission=False, writePermission=True)
+    ])
 async def form_request_update(self, info: strawberry.types.Info, request: FormRequestUpdateGQLModel) -> FormRequestResultGQLModel:
     user = getUserFromInfo(info)
     request.changedby = uuid.UUID(user["id"])
@@ -234,8 +344,6 @@ async def form_test_extension(self, info: strawberry.types.Info, param: typing.O
     print("form_test_extension", param, flush=True)
     return None
 
-
-from ._GraphPermissions import StateBasedPermission
 
 @strawberry.mutation(
     description="U operation",
@@ -302,89 +410,98 @@ query statetransitionById($id: UUID!) {
     # form_row.history = history_row
     form_row.history = None
     form_row.history_id = history_row.id
+
+    copy_form = await CopyForm(
+        info=info, 
+        request_id=request.id, 
+        source_form_id=form_id, 
+        copy_form_id=copy_form_id, 
+        copy_state_id=target_id,
+        copy_item_values=True
+    )
     # copy_form = await formloader.insert(entity=form_row, extraAttributes={"id": copy_form_id, "state_id": target_id})
-    copy_form = await formloader.insert(
-        entity=None, 
-        extraAttributes={
-            "id": copy_form_id, 
-            "state_id": target_id,
-            "request_id": request.id,
-            "name": form_row.name,
-            "rbacobject": form_row.rbacobject,
-            "type_id": form_row.type_id
-        })
-    print(f"copy_form {copy_form.state_id} {copy_form}({copy_form.id} / {copy_form_id})")
-    from .SectionGQLModel import SectionGQLModel
-    section_loader = SectionGQLModel.getLoader(info=info)
-    sections = await section_loader.filter_by(form_id=form_id)
-    sections = list(sections)
-    # print("sections", sections, flush=True)
-    section_ids = list(map(lambda section: section.id, sections))
-    # print("section_ids", section_ids, flush=True)
-    assert len(section_ids) !=0, f"request's {request.id} form has no sections :("
-    copy_sections = (section_loader.insert(
-        # entity=section, 
-        entity=None, 
-        extraAttributes={
-            "id": uuid.uuid1(), 
-            "form_id": copy_form_id, 
-            "state_id": target_id,
-            "rbacobject": section.rbacobject,
-            "name": section.name,
-            }) for section in sections)
-    copy_sections = await asyncio.gather(*copy_sections)
-    # print("copy_sections", copy_sections, flush=True)
-    sections_map = {oldid: copy_section.id for copy_section, oldid in zip(copy_sections, section_ids)}
-    # print("sections_map", sections_map, flush=True)
+    # copy_form = await formloader.insert(
+    #     entity=None, 
+    #     extraAttributes={
+    #         "id": copy_form_id, 
+    #         "state_id": target_id,
+    #         "request_id": request.id,
+    #         "name": form_row.name,
+    #         "rbacobject": form_row.rbacobject,
+    #         "type_id": form_row.type_id
+    #     })
+    # print(f"copy_form {copy_form.state_id} {copy_form}({copy_form.id} / {copy_form_id})")
+    # from .SectionGQLModel import SectionGQLModel
+    # section_loader = SectionGQLModel.getLoader(info=info)
+    # sections = await section_loader.filter_by(form_id=form_id)
+    # sections = list(sections)
+    # # print("sections", sections, flush=True)
+    # section_ids = list(map(lambda section: section.id, sections))
+    # # print("section_ids", section_ids, flush=True)
+    # assert len(section_ids) !=0, f"request's {request.id} form has no sections :("
+    # copy_sections = (section_loader.insert(
+    #     # entity=section, 
+    #     entity=None, 
+    #     extraAttributes={
+    #         "id": uuid.uuid1(), 
+    #         "form_id": copy_form_id, 
+    #         "state_id": target_id,
+    #         "rbacobject": section.rbacobject,
+    #         "name": section.name,
+    #         }) for section in sections)
+    # copy_sections = await asyncio.gather(*copy_sections)
+    # # print("copy_sections", copy_sections, flush=True)
+    # sections_map = {oldid: copy_section.id for copy_section, oldid in zip(copy_sections, section_ids)}
+    # # print("sections_map", sections_map, flush=True)
 
-    from .PartGQLModel import PartGQLModel
-    part_loader = PartGQLModel.getLoader(info=info)
-    part_db_model = part_loader.getModel()
+    # from .PartGQLModel import PartGQLModel
+    # part_loader = PartGQLModel.getLoader(info=info)
+    # part_db_model = part_loader.getModel()
     
-    parts_select_statement = part_loader.getSelectStatement()
-    parts_select_statement = parts_select_statement.filter(part_db_model.section_id.in_(section_ids))
-    parts = await part_loader.execute_select(parts_select_statement)
-    parts = list(parts)
-    part_ids = list(map(lambda part: part.id, parts))
-    # print("part_ids", part_ids, flush=True)
-    copy_parts = (part_loader.insert(
-        # entity=part, 
-        entity=None, 
-        extraAttributes={
-            "id": uuid.uuid1(), 
-            "section_id": sections_map[part.section_id], 
-            "state_id": target_id,
-            "rbacobject": part.rbacobject,
-            "name": part.name,
-            }) for part in parts)
-    copy_parts = await asyncio.gather(*copy_parts)
-    # print("copy_parts", copy_parts, flush=True)
-    parts_map = {oldid: copy_part.id for copy_part, oldid in zip(copy_parts, part_ids)}
-    # print("parts_map", parts_map, flush=True)
-    # copy_part_ids = {id: uuid.uuid1() for id in part_ids}
+    # parts_select_statement = part_loader.getSelectStatement()
+    # parts_select_statement = parts_select_statement.filter(part_db_model.section_id.in_(section_ids))
+    # parts = await part_loader.execute_select(parts_select_statement)
+    # parts = list(parts)
+    # part_ids = list(map(lambda part: part.id, parts))
+    # # print("part_ids", part_ids, flush=True)
+    # copy_parts = (part_loader.insert(
+    #     # entity=part, 
+    #     entity=None, 
+    #     extraAttributes={
+    #         "id": uuid.uuid1(), 
+    #         "section_id": sections_map[part.section_id], 
+    #         "state_id": target_id,
+    #         "rbacobject": part.rbacobject,
+    #         "name": part.name,
+    #         }) for part in parts)
+    # copy_parts = await asyncio.gather(*copy_parts)
+    # # print("copy_parts", copy_parts, flush=True)
+    # parts_map = {oldid: copy_part.id for copy_part, oldid in zip(copy_parts, part_ids)}
+    # # print("parts_map", parts_map, flush=True)
+    # # copy_part_ids = {id: uuid.uuid1() for id in part_ids}
 
-    from .ItemGQLModel import ItemGQLModel
-    item_loader = ItemGQLModel.getLoader(info=info)
-    item_db_model = item_loader.getModel()
-    items_select_statement = item_loader.getSelectStatement()
-    items_select_statement = items_select_statement.filter(item_db_model.part_id.in_(part_ids))
-    items = await item_loader.execute_select(items_select_statement)
-    items = list(items)
-    # item_ids = list(map(lambda item: item.id, items))
-    copy_items = (item_loader.insert(
-        # entity=item, 
-        entity=None, 
-        extraAttributes={
-            "id": uuid.uuid1(), 
-            "part_id": parts_map[item.part_id], 
-            "state_id": target_id,
-            "rbacobject": item.rbacobject,
-            "name": item.name,
-            "value": item.value,
-            "type_id": item.type_id
-            }) for item in items )
-    copy_items = await asyncio.gather(*copy_items)
-    # copy_item_ids = {id: uuid.uuid1() for id in item_ids}
+    # from .ItemGQLModel import ItemGQLModel
+    # item_loader = ItemGQLModel.getLoader(info=info)
+    # item_db_model = item_loader.getModel()
+    # items_select_statement = item_loader.getSelectStatement()
+    # items_select_statement = items_select_statement.filter(item_db_model.part_id.in_(part_ids))
+    # items = await item_loader.execute_select(items_select_statement)
+    # items = list(items)
+    # # item_ids = list(map(lambda item: item.id, items))
+    # copy_items = (item_loader.insert(
+    #     # entity=item, 
+    #     entity=None, 
+    #     extraAttributes={
+    #         "id": uuid.uuid1(), 
+    #         "part_id": parts_map[item.part_id], 
+    #         "state_id": target_id,
+    #         "rbacobject": item.rbacobject,
+    #         "name": item.name,
+    #         "value": item.value,
+    #         "type_id": item.type_id
+    #         }) for item in items )
+    # copy_items = await asyncio.gather(*copy_items)
+    # # copy_item_ids = {id: uuid.uuid1() for id in item_ids}
 
 
     # change state of request
@@ -400,7 +517,7 @@ query statetransitionById($id: UUID!) {
     updated_request_row = await request_loader.update(
         # entity=request_row, 
         entity=dbmodel(**requestAttributeValues), 
-)
+    )
 
     result = FormRequestResultGQLModel(id=request.id, msg="ok")
     result.msg = "fail" if updated_request_row is None else "ok"

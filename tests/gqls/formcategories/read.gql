@@ -1,0 +1,16 @@
+query formCategoryById($id: UUID!) {
+  result: formCategoryById(id: $id) {
+    ...FormCategoryModel
+  }
+}
+
+fragment FormCategoryModel on FormCategoryGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  created
+  createdby { id }
+  changedby { id }
+  rbacobject { id }
+}

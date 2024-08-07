@@ -52,7 +52,7 @@ class PartGQLModel(BaseGQLModel):
         description="""Part's order""",
         permission_classes=[OnlyForAuthentized])
     def order(self) -> int:
-        return self.order
+        return self.order if self.order else 0
 
     @strawberry.field(
         description="Retrieves the section owning this part",

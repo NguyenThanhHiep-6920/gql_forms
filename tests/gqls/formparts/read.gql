@@ -1,0 +1,22 @@
+query formPartById($id: UUID!) {
+  result: formPartById(id: $id) {
+    ...PartModel
+  }
+}
+
+fragment PartModel on FormPartGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  order
+  items {
+    id name
+  }
+
+  section { id name }
+  created
+  createdby { id }
+  changedby { id }
+  rbacobject { id }
+}

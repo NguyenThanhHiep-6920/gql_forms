@@ -181,10 +181,15 @@ class Mutation:
     form_history_update = history_update
 
     from .ItemCategoryGQLModel import (
-        item_category_update, item_category_insert
+        item_category_update, 
+        item_category_insert, 
+        item_category_page, 
+        item_category_by_id
     )
     form_item_category_update = item_category_update
     form_item_category_insert = item_category_insert
+    form_item_category_page = item_category_page
+    form_item_category_by_id = item_category_by_id
 
     
 

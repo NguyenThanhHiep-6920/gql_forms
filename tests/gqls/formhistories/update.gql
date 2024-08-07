@@ -1,0 +1,23 @@
+mutation formHistoryUpdate($id: UUID!, $lastchange: DateTime!, $name: String!) {
+  result: formHistoryUpdate(history: {id: $id, lastchange: $lastchange, name: $name}) {
+    id
+    msg
+    result: history {
+    	...RequestHistoryModel  
+    }
+  }
+}
+
+fragment RequestHistoryModel on RequestHistoryGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  form { id name }
+  request { id name }
+  state { id }
+  created
+  createdby { id }
+  changedby { id }
+  rbacobject { id }
+}

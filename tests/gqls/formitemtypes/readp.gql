@@ -1,0 +1,17 @@
+query formItemTypeById($skip: Int, $limit: Int, $where: FormItemTypeWhereFilter) {
+  result: formItemTypePage(skip: $skip, limit: $limit, where: $where) {
+    ...FormItemTypeModel
+  }
+}
+
+fragment FormItemTypeModel on FormItemTypeGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  category { id name }
+  created
+  createdby { id }
+  changedby { id }
+  rbacobject { id }
+}

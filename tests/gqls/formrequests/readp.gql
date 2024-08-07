@@ -1,0 +1,34 @@
+query ($skip: Int, $limit: Int, $where: RequestWhereFilter) {
+  result: requestPage(skip: $skip, limit: $limit, where: $where) {
+    ...RequestModel
+  }
+}
+
+
+fragment RequestModel on RequestGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  nameEn
+  histories {
+    id
+    name
+    form {
+      id
+    }
+  }
+  created
+  changedby {
+    id
+  }
+  createdby {
+    id
+  }
+  creator {
+    id
+  }
+  rbacobject {
+    id
+  }
+}
