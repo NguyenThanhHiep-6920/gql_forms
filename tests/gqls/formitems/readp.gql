@@ -1,0 +1,21 @@
+query formItemById($skip: Int, $limit: Int, $where: FormItemWhereFilter) {
+  result: formItemPage(skip: $skip, limit: $limit, where: $where) {
+    ...ItemModel
+  }
+}
+
+fragment ItemModel on FormItemGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  order
+  value
+  type { id name }
+  part { id name }
+  
+  created
+  createdby { id }
+  changedby { id }
+  rbacobject { id }
+}

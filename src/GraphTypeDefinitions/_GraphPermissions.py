@@ -470,7 +470,7 @@ def StateBasedPermission(GQLModel, parameterName=None, readPermission=True, writ
             state_id = getattr(dbrow, "state_id", sentinel)
             assert state_id != sentinel, f"{dbrow} has not attribute state_id which is needed for permission resolution"
             userRoles = await RBACObjectGQLModel.resolve_user_roles(info=info)
-            print(f"StateBasedPermission.userRoles {userRoles}", flush=True)
+            # print(f"StateBasedPermission.userRoles {userRoles}", flush=True)
             roletypes = await RBACObjectGQLModel.resolve_role_types_on_state(info=info, state_id=state_id, readPermission=readPermission, writePermission=writePermission)
             print(f"StateBasedPermission.roletypes {roletypes}", flush=True)
             neededRoleIds = list(map(lambda roleType: roleType["id"], roletypes))

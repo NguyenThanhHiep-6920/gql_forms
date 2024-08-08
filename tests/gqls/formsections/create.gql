@@ -1,0 +1,37 @@
+mutation formSectionInsert($id: UUID, $name: String!, $form_id: UUID!, $order: Int) {
+  result: formSectionInsert(
+    section: {id: $id, name: $name, order: $order, formId: $form_id}
+  ) {
+    id
+    msg
+    result: section {
+      ...SectionModel
+    }
+  }
+}
+
+fragment SectionModel on FormSectionGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  order
+  parts {
+    id
+    name
+  }
+  form {
+    id
+    name
+  }
+  created
+  createdby {
+    id
+  }
+  changedby {
+    id
+  }
+  rbacobject {
+    id
+  }
+}

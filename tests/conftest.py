@@ -232,8 +232,86 @@ def RoleTypes(DemoData):
     roletypes = DemoData["roletypes"]
     return roletypes
 
+def stateById(query, variables):
+    DemoData = get_demodata()
+    id = variables["id"]
+    states = DemoData["states"]
+    state = next(filter(lambda state: f'{state["id"]}' == id, states), None)
+    assert state is not None, f"state {id} not found in demodata"
+    readerslist_id = state["readerslist_id"]
+    writerslist_id = state["writerslist_id"]
+    logging.info(f"readerslist_id {readerslist_id}")
+    logging.info(f"writerslist_id {writerslist_id}")
+    print("readerslist_id", readerslist_id, type(readerslist_id), flush=True)
+    print("writerslist_id", writerslist_id, type(writerslist_id), flush=True)
+    roletypelists = DemoData["roletypelists"]
+    # logging.info(f"roletypelists {roletypelists}")
+    print(f"roletypelists {roletypelists}", flush=True)
+    readerroletypes_ids = list(
+        map(lambda roletypelist: roletypelist["type_id"], 
+        filter(lambda roletypelist: roletypelist["list_id"] == readerslist_id, roletypelists)))
+    writerroletypes_ids = list(
+        map(lambda roletypelist: roletypelist["type_id"], 
+        filter(lambda roletypelist: roletypelist["list_id"] == writerslist_id, roletypelists)))
+    allroletypes = DemoData["roletypes"]
+    readerroletypes = list(filter(lambda roletype: roletype["id"] in readerroletypes_ids, allroletypes))
+    writerroletypes = list(filter(lambda roletype: roletype["id"] in writerroletypes_ids, allroletypes))
+    print(f"readerroletypes {readerroletypes}", flush=True)
+    print(f"writerroletypes {writerroletypes}", flush=True)
+    response_state_query = {"data": {"result": {
+        "readroletypes": readerroletypes,
+        "writeroletypes": writerroletypes,
+        }}}
+    return response_state_query
+
+
+def statetransitionById(query, variables):
+    DemoData = get_demodata()
+    id = variables["id"]
+    statetransitions = DemoData["statetransitions"]
+    result = next(filter(lambda st: f'{st["id"]}' == id, statetransitions), None)
+    assert result is not None, f"statetransition id={id} not found"
+    result = {"source": {"id": result["source_id"]}, "target": {"id": result["target_id"]}}
+    result = {"data": {"result": result}}
+    return result
+
+#     query = """query statetransitionById($id: UUID!) {
+#   result: statetransitionById(id: $id) {
+#     source { id }
+#     target { id }
+#   }
+# }"""    
+#     pass
+
+
 @pytest.fixture(scope=serversTestscope)
-def AllRoleResponse(RoleTypes, AdminUser, University):
+def AllTimeResponse(DemoData):
+    # def stateById2(query, variables):
+    #     id = variables["id"]
+    #     states = DemoData["states"]
+    #     state = next(filter(lambda state: state["id"] == id, states), None)
+    #     assert state is not None, f"state {id} not found in demodata"
+    #     readerslist_id = state["readerslist_id"]
+    #     writerslist_id = state["writerslist_id"]
+    #     roletypelists = DemoData["roletypelists"]
+    #     readerroletypes = list(filter(lambda roletypelist: roletypelist["list_id"] == readerslist_id, roletypelists))
+    #     writerroletypes = list(filter(lambda roletypelist: roletypelist["list_id"] == writerslist_id, roletypelists))
+
+    #     response_state_query = {"data": {"result": {
+    #         "readroletypes": readerroletypes,
+    #         "writeroletypes": writerroletypes,
+    #         }}}
+    #     return response_state_query
+    
+    result = {
+        "query stateById($id: UUID!) {": stateById,
+        "query statetransitionById($id: UUID!) {": statetransitionById
+    }
+    return result
+
+
+@pytest.fixture(scope=serversTestscope)
+def AllRoleResponse(AllTimeResponse, RoleTypes, AdminUser, University, DemoData):
     roletypes = RoleTypes
     allRoles = [
         {"user": {**AdminUser}, "group": {**University}, "type": {**r}}
@@ -251,16 +329,18 @@ def AllRoleResponse(RoleTypes, AdminUser, University):
     ]}}}
 
     # print("createRoleResponse.result", response)
+
     result = {
+        **AllTimeResponse,
         "query($limit: Int) {roles: roleTypePage(limit: $limit) {id, name, nameEn}}": {"data": {"roletypes": roletypes}},
         "query me {": response,
-        "query RBAC($rbac_id: UUID!, $user_id: UUID) {": response
+        "query RBAC($rbac_id: UUID!, $user_id: UUID) {": response,
     }
     return result
 
 
 @pytest.fixture(scope=serversTestscope)
-def NoRoleResponse(RoleTypes):
+def NoRoleResponse(AllTimeResponse, RoleTypes):
     roletypes = RoleTypes
     otherroles = [
         {"user": {"id": uuid1()}, "group": {"id": uuid1()}, "type": random.choice(roletypes)}
@@ -274,6 +354,7 @@ def NoRoleResponse(RoleTypes):
     #print("NoRoleResponse.result", response)
     
     result = {
+        **AllTimeResponse,
         "query($limit: Int) {roles: roleTypePage(limit: $limit) {id, name, nameEn}}": {"data": {"roletypes": roletypes}},
         "query me {": response,
         "query RBAC($rbac_id: UUID!, $user_id: UUID) {": response
@@ -314,11 +395,15 @@ def run(port, response):
 
     @app.post("/gql")
     async def gql_query(item: Item):
-        print("APP queried", item.query)
-        logging.info(f"SERVER Query {item} -> {response}")
+        # print("APP queried", item.query)
         querylines = item.query.split("\n")
         queryline = querylines[0]
-        return response[queryline]
+        assert queryline in response, f"asked for {item.query}, I have no response"
+        resultresponse = response[queryline]
+        if callable(resultresponse):
+            resultresponse = resultresponse(query=item.query, variables=item.variables)
+        logging.info(f"SERVER Query {item} -> {resultresponse}")
+        return resultresponse
     #print("APP created for", response)
 
     uvicorn.run(app, port=port)

@@ -1,0 +1,10 @@
+mutation($id: UUID!, $trasition_id: UUID!, $lastchange: DateTime!, $history_message: String!) {
+  formRequestUseTransition(request: {id: $id, transitionId: $trasition_id, lastchange: $lastchange, historyMessage: $history_message}) {
+    id
+    msg
+    request {
+      name
+      state { id }
+    }
+  }
+}

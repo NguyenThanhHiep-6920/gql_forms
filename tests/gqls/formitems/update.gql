@@ -1,0 +1,38 @@
+mutation formItemUpdate($id: UUID!, $name: String!, $value: String, $order: Int, $lastchange: DateTime!) {
+  result: formItemUpdate(
+    item: {id: $id, name: $name, value: $value, order: $order, lastchange: $lastchange}
+  ) {
+    id
+    msg
+    result: item {
+      ...ItemModel
+    }
+  }
+}
+
+fragment ItemModel on FormItemGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  order
+  value
+  type {
+    id
+    name
+  }
+  part {
+    id
+    name
+  }
+  created
+  createdby {
+    id
+  }
+  changedby {
+    id
+  }
+  rbacobject {
+    id
+  }
+}

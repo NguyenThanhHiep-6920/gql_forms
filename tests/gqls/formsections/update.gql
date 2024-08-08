@@ -1,0 +1,37 @@
+mutation formSectionUpdate($id: UUID!, $lastchange: DateTime!, $name: String, $order: Int) {
+  result: formSectionUpdate(
+    section: {id: $id, name: $name, order: $order, lastchange: $lastchange}
+  ) {
+    id
+    msg
+    result: section {
+      ...SectionModel
+    }
+  }
+}
+
+fragment SectionModel on FormSectionGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  order
+  parts {
+    id
+    name
+  }
+  form {
+    id
+    name
+  }
+  created
+  createdby {
+    id
+  }
+  changedby {
+    id
+  }
+  rbacobject {
+    id
+  }
+}

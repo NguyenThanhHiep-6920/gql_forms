@@ -1,0 +1,24 @@
+mutation formItemInsert($id: UUID, $name: String!, $part_id: UUID!, $value: String, $order: Int) {
+  result: formItemInsert(item: {id: $id, name: $name, partId: $part_id, value: $value, order: $order}) {
+    id
+    msg
+    result:  item{
+      ...ItemModel
+    }
+  }
+}
+fragment ItemModel on FormItemGQLModel {
+  __typename
+  id
+  lastchange
+  name
+  order
+  value
+  type { id name }
+  part { id name }
+  
+  created
+  createdby { id }
+  changedby { id }
+  rbacobject { id }
+}

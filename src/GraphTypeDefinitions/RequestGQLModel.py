@@ -156,7 +156,7 @@ request_page = strawberry.field(
 @strawberry.input(description="Input structure - C operation")
 class FormRequestInsertGQLModel:
     name: str = strawberry.field(description="Request name")
-    form__id: uuid.UUID = strawberry.field(description="id of the form which will be copied as initial form of the request")
+    form_id: uuid.UUID = strawberry.field(description="id of the form which will be copied as initial form of the request")
     state_id: uuid.UUID = strawberry.field(description="id of the request state")
 
     id: typing.Optional[uuid.UUID] = strawberry.field(description="primary key (UUID), could be client generated", default=None)
@@ -324,25 +324,25 @@ async def form_request_update(self, info: strawberry.types.Info, request: FormRe
     return result   
 
 
-from strawberry.extensions import FieldExtension
+# from strawberry.extensions import FieldExtension
 
 
-class TestExtension(FieldExtension):
-    async def resolve_async(
-        self, next: typing.Callable[..., typing.Any], source: typing.Any, info: strawberry.Info, **kwargs
-    ):
-        print("TestExtension", source, type(source), info, kwargs, flush=True)
-        result = await next(source, info, **kwargs)
-        print("TestExtension.result", result, flush=True)
-        return result
+# class TestExtension(FieldExtension):
+#     async def resolve_async(
+#         self, next: typing.Callable[..., typing.Any], source: typing.Any, info: strawberry.Info, **kwargs
+#     ):
+#         print("TestExtension", source, type(source), info, kwargs, flush=True)
+#         result = await next(source, info, **kwargs)
+#         print("TestExtension.result", result, flush=True)
+#         return result
 
-@strawberry.field(
-    description="U operation",
-    extensions=[TestExtension()]
-    )
-async def form_test_extension(self, info: strawberry.types.Info, param: typing.Optional[str] = "default") -> typing.Optional[FormRequestResultGQLModel]:
-    print("form_test_extension", param, flush=True)
-    return None
+# @strawberry.field(
+#     description="U operation",
+#     extensions=[TestExtension()]
+#     )
+# async def form_test_extension(self, info: strawberry.types.Info, param: typing.Optional[str] = "default") -> typing.Optional[FormRequestResultGQLModel]:
+#     print("form_test_extension", param, flush=True)
+#     return None
 
 
 @strawberry.mutation(
@@ -358,8 +358,7 @@ async def form_request_use_transition(self, info: strawberry.types.Info, request
     # change state of request
     from uoishelpers.gqlpermissions import RBACObjectGQLModel
     client = RBACObjectGQLModel.get_async_client(info=info)
-    query = """
-query statetransitionById($id: UUID!) {
+    query = """query statetransitionById($id: UUID!) {
   result: statetransitionById(id: $id) {
     source { id }
     target { id }
@@ -371,7 +370,7 @@ query statetransitionById($id: UUID!) {
     }
     jsonResponse = await client(query=query, variables=variables)
     assert "errors" not in jsonResponse, f"got error {jsonResponse}"
-    # print(f"got jsonResponse from UG {jsonResponse}")
+    print(f"got jsonResponse from UG {jsonResponse}", flush=True)
     jsonResult = jsonResponse["data"]["result"]
     source_id = uuid.UUID(jsonResult["source"]["id"])
     target_id = uuid.UUID(jsonResult["target"]["id"])

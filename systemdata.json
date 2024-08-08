@@ -1,4 +1,84 @@
 {
+    "statemachines": [
+        {
+            "id": "15257c8c-a259-46d3-993f-83d2a8d02b85",
+            "name": "State machine A",
+            "name_en": "State machine A",
+            "type_id": "87541a27-38ff-4bc0-9499-28ad346c51b1",
+            "createdby": "2d9dc5ca-a4a2-11ed-b9df-0242ac120003",
+            "changedby": "2d9dc5ca-a4a2-11ed-b9df-0242ac120003",
+            "initial_state_id": "eb085919-640b-43f5-863d-2e69e4a86fe4"
+        },
+        {
+            "id": "2eea088a-ee0f-4bbd-b0dc-d86a48f0402d",
+            "name": "State machine B",
+            "name_en": "State machine B",
+            "type_id": "87541a27-38ff-4bc0-9499-28ad346c51b1",
+            "createdby": "2d9dc5ca-a4a2-11ed-b9df-0242ac120003",
+            "changedby": "2d9dc5ca-a4a2-11ed-b9df-0242ac120003"
+        }
+    ],
+    "statemachinetypes": [
+        {
+            "id": "87541a27-38ff-4bc0-9499-28ad346c51b1",
+            "name": "State machine type A",
+            "name_en": "State machine type A",
+            "category_id": "2141f3e3-1dc6-449b-b60b-c8d1c03aeaf6"
+        }
+    ],
+    "statemachinecategories": [
+        {
+            "id": "2141f3e3-1dc6-449b-b60b-c8d1c03aeaf6",
+            "name": "State machine category A",
+            "name_en": "State machine category A"
+        }
+    ],
+    "states": [
+        {
+            "id": "eb085919-640b-43f5-863d-2e69e4a86fe4",
+            "name": "State A",
+            "name_en": "State A",
+            "order": 0,
+            "statemachine_id": "15257c8c-a259-46d3-993f-83d2a8d02b85",
+            "readerslist_id": "c0c0dad0-319e-4d5d-b3db-cea1e3e1435e",
+            "writerslist_id": "c5e08e7f-2fab-4574-8f84-651fed9a3e7c"
+        },
+        {
+            "id": "f9632f9a-cb18-4ca3-b71e-0e0c37cf334a",
+            "name": "State B",
+            "name_en": "State B",
+            "order": 1,
+            "statemachine_id": "15257c8c-a259-46d3-993f-83d2a8d02b85",
+            "readerslist_id": "371b130f-33d7-4c91-87e6-ce7e211a0963",
+            "writerslist_id": "90a1901d-190e-4cb7-a818-e9e95bd93f46"
+        },
+        {
+            "id": "b44b9aef-d895-4ff5-a3ed-2f41ddc81f3a",
+            "name": "State C",
+            "name_en": "State C",
+            "order": 3,
+            "statemachine_id": "15257c8c-a259-46d3-993f-83d2a8d02b85",
+            "readerslist_id": "b77b44ac-8507-4061-a6e3-0d35d0f0f97f",
+            "writerslist_id": "e8f9d9f0-d73d-4fbc-bb44-24acb6bf9a43"
+        }
+    ],
+    "statetransitions": [
+        {
+            "id": "322cec6a-6c62-4611-8b67-a3b1532a9f17",
+            "name": "approve",
+            "source_id": "eb085919-640b-43f5-863d-2e69e4a86fe4",
+            "target_id": "f9632f9a-cb18-4ca3-b71e-0e0c37cf334a",
+            "statemachine_id": "15257c8c-a259-46d3-993f-83d2a8d02b85"
+        },
+        {
+            "id": "e3d65260-75b1-431f-8872-1d034cd7f0cb",
+            "name": "decline",
+            "source_id": "f9632f9a-cb18-4ca3-b71e-0e0c37cf334a",
+            "target_id": "eb085919-640b-43f5-863d-2e69e4a86fe4",
+            "statemachine_id": "15257c8c-a259-46d3-993f-83d2a8d02b85"
+        }
+    ],
+
     "externalids": [
         {
             "id": "d5d5286d-50d2-4b07-97de-7407c62c21c0",
@@ -259,6 +339,44 @@
             "grouptype_id": "de8654be-e776-4b6e-bb1e-2d5c949aa1eb",
             "mastergroup_id": "2d9dced0-a4a2-11ed-b9df-0242ac120003"
         }
+    ],
+    "roletypelists": [
+        {
+            "id": "84235021-7e50-402e-946e-7f6b455821e4",
+            "list_id": "c5056e8d-736a-4afb-aa7f-9ca626a19916",
+            "type_id": "ced46aa4-3217-4fc1-b79d-f6be7d21c6b6"
+        },
+        {
+            "id": "3d66dccd-4779-4e3b-9c30-db578c937611",
+            "list_id": "c0c0dad0-319e-4d5d-b3db-cea1e3e1435e",
+            "type_id": "ced46aa4-3217-4fc1-b79d-f6be7d21c6b6"
+        },
+        {
+            "id": "fcf28721-4076-46be-962e-03c1b19b75a4",
+            "list_id": "c5e08e7f-2fab-4574-8f84-651fed9a3e7c",
+            "type_id": "ced46aa4-3217-4fc1-b79d-f6be7d21c6b6"
+        },
+        {
+            "id": "54e63686-7303-44bd-97bb-08dc0578016a",
+            "list_id": "371b130f-33d7-4c91-87e6-ce7e211a0963",
+            "type_id": "ced46aa4-3217-4fc1-b79d-f6be7d21c6b6"
+        },
+        {
+            "id": "00fc5a9e-0618-40ea-9ba1-e50d9a8b006f",
+            "list_id": "90a1901d-190e-4cb7-a818-e9e95bd93f46",
+            "type_id": "ced46aa4-3217-4fc1-b79d-f6be7d21c6b6"
+        },
+        {
+            "id": "cb752100-818d-4116-9cb6-f9f8cdcd6733",
+            "list_id": "b77b44ac-8507-4061-a6e3-0d35d0f0f97f",
+            "type_id": "ced46aa4-3217-4fc1-b79d-f6be7d21c6b6"
+        },
+        {
+            "id": "5a35e858-b6dd-4587-9512-09f7969d4e5f",
+            "list_id": "b77b44ac-8507-4061-a6e3-0d35d0f0f97f",
+            "type_id": "ced46aa4-3217-4fc1-b79d-f6be7d21c6b6"
+        }
+
     ],
 
     "roles": [
