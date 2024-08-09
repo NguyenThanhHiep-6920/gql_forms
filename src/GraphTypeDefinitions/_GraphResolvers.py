@@ -54,16 +54,16 @@ resolve_result_id: IDType = strawberry.field(description="primary key of CU oper
 resolve_result_msg: str = strawberry.field(description="""Should be `ok` if descired state has been reached, otherwise `fail`.
 For update operation fail should be also stated when bad lastchange has been entered.""")
 
-def getUserFromInfo(info: strawberry.types.Info):
-    result = info.context.get("user", None)
-    if result is None:
-        request = info.context.get("request", None)
-        assert request is not None, "request should be in context, something is wrong"
-        result = request.scope.get("user", None)
-    assert result is not None, "User is wanted but not present in context or in request.scope, check it"
-    return result
+# def getUserFromInfo(info: strawberry.types.Info):
+#     result = info.context.get("user", None)
+#     if result is None:
+#         request = info.context.get("request", None)
+#         assert request is not None, "request should be in context, something is wrong"
+#         result = request.scope.get("user", None)
+#     assert result is not None, "User is wanted but not present in context or in request.scope, check it"
+#     return result
 
-
+from uoishelpers.resolvers import getLoadersFromInfo, getUserFromInfo
 async def encapsulateInsert(info, loader, entity, result):
     actinguser = getUserFromInfo(info)
     id = uuid.UUID(actinguser["id"])

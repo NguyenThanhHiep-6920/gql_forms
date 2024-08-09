@@ -5,7 +5,8 @@ import uuid
 import logging
 
 from typing import Annotated
-from src.utils.Dataloaders import getLoadersFromInfo, getUserFromInfo
+# from src.utils.Dataloaders import getLoadersFromInfo, getUserFromInfo
+from uoishelpers.resolvers import getLoadersFromInfo, getUserFromInfo
 from .BaseGQLModel import BaseGQLModel
 
 from ._GraphResolvers import (

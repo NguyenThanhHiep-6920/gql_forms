@@ -446,17 +446,17 @@ demouser = {
     ]
 }
 
-def getUserFromInfo(info):
-    context = info.context
-    #print(list(context.keys()))
-    user = context.get("user", None)
-    if user is None:
-        request = context.get("request", None)
-        assert request is not None, "request is missing in context :("
-        user = request.scope.get("user", None)
-        assert user is not None, "missing user in context or in request.scope"
-    logging.debug("getUserFromInfo", user)
-    return user
+# def getUserFromInfo(info):
+#     context = info.context
+#     #print(list(context.keys()))
+#     user = context.get("user", None)
+#     if user is None:
+#         request = context.get("request", None)
+#         assert request is not None, "request is missing in context :("
+#         user = request.scope.get("user", None)
+#         assert user is not None, "missing user in context or in request.scope"
+#     logging.debug("getUserFromInfo", user)
+#     return user
 
 def getAuthorizationToken(info):
     context = info.context

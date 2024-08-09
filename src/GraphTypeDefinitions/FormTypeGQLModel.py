@@ -4,7 +4,8 @@ import typing
 import uuid
 
 from typing import Annotated
-from src.utils.Dataloaders import getLoadersFromInfo, getUserFromInfo
+# from src.utils.Dataloaders import getLoadersFromInfo, getUserFromInfo
+from uoishelpers.resolvers import getLoadersFromInfo, getUserFromInfo
 from .BaseGQLModel import BaseGQLModel
 
 from ._GraphPermissions import RoleBasedPermission, OnlyForAuthentized
