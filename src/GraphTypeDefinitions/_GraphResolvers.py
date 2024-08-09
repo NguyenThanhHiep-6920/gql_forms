@@ -63,34 +63,41 @@ For update operation fail should be also stated when bad lastchange has been ent
 #     assert result is not None, "User is wanted but not present in context or in request.scope, check it"
 #     return result
 
-from uoishelpers.resolvers import getLoadersFromInfo, getUserFromInfo
-async def encapsulateInsert(info, loader, entity, result):
-    actinguser = getUserFromInfo(info)
-    id = uuid.UUID(actinguser["id"])
-    entity.createdby = id
+from uoishelpers.resolvers import (
+    getLoadersFromInfo, 
+    getUserFromInfo, 
+    encapsulateDelete, 
+    encapsulateInsert, 
+    encapsulateUpdate
+    )
 
-    row = await loader.insert(entity)
-    assert result.msg is not None, "result msg must be predefined (Operation Insert)"
-    result.id = row.id
-    return result
+# async def encapsulateInsert(info, loader, entity, result):
+#     actinguser = getUserFromInfo(info)
+#     id = uuid.UUID(actinguser["id"])
+#     entity.createdby = id
 
-async def encapsulateUpdate(info, loader, entity, result):
-    actinguser = getUserFromInfo(info)
-    id = uuid.UUID(actinguser["id"])
-    entity.changedby = id
+#     row = await loader.insert(entity)
+#     assert result.msg is not None, "result msg must be predefined (Operation Insert)"
+#     result.id = row.id
+#     return result
 
-    row = await loader.update(entity)
-    result.id = entity.id if result.id is None else result.id 
-    result.msg = "ok" if row is not None else "fail"
-    return result
+# async def encapsulateUpdate(info, loader, entity, result):
+#     actinguser = getUserFromInfo(info)
+#     id = uuid.UUID(actinguser["id"])
+#     entity.changedby = id
 
-import sqlalchemy.exc
+#     row = await loader.update(entity)
+#     result.id = entity.id if result.id is None else result.id 
+#     result.msg = "ok" if row is not None else "fail"
+#     return result
 
-async def encapsulateDelete(info, loader, id, result):
-    # try:
-    #     await loader.delete(id)
-    # except sqlalchemy.exc.IntegrityError as e:
-    #     result.msg='fail'
-    # return result
-    await loader.delete(id)
-    return result
+# import sqlalchemy.exc
+
+# async def encapsulateDelete(info, loader, id, result):
+#     # try:
+#     #     await loader.delete(id)
+#     # except sqlalchemy.exc.IntegrityError as e:
+#     #     result.msg='fail'
+#     # return result
+#     await loader.delete(id)
+#     return result

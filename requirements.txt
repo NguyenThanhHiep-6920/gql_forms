@@ -17,4 +17,6 @@ click
 aiodataloader
 pyjwt[crypto]
 
+prometheus_fastapi_instrumentator
 https://github.com/hrbolek/uoishelpers/archive/refs/heads/main.zip
+
