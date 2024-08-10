@@ -405,7 +405,9 @@ def RoleBasedPermission(roles: str = "", whatreturn=[]):
 from uoishelpers.gqlpermissions import RBACObjectGQLModel, WithRolesPermission
 from strawberry.types.base import StrawberryList
 sentinel = "ea3afa47-3fc4-4d50-8b76-65e3d54cce01"
-def RoleBasedPermissionUpdate(roles: str, GQLModel):
+@cache
+def RoleBasedPermissionForRUDOps(roles: str, GQLModel):
+    "checks user's roles on rbac object and compare them with roles param"
     roleNames = roles.split(";")
     roleNames = list(map(lambda rolename: rolename.strip(), roleNames))
     class RoleBasedPermissionResult(WithRolesPermission):
@@ -420,18 +422,23 @@ def RoleBasedPermissionUpdate(roles: str, GQLModel):
             # return False
             # logging.info(f"has_permission {kwargs}")
             self.defaultResult = [] if info._field.type.__class__ == StrawberryList else None
-            loader = GQLModel.getLoader(info=info)
-            [firstParameter, *_] = kwargs.values()
-            id = getattr(firstParameter, "id", sentinel)
-            assert id != sentinel, f"During permission test on update mutation has bee found that the first parameter of resolve has no id attribute"
-            dbrow = await loader.load(id)
+            
+            if source is None:
+                loader = GQLModel.getLoader(info=info)
+                [firstParameter, *_] = kwargs.values()
+                id = getattr(firstParameter, "id", sentinel)
+                assert id != sentinel, f"During permission test on update mutation has bee found that the first parameter of resolve has no id attribute"
+                dbrow = await loader.load(id)
+            else:
+                dbrow = source
+
             rbacobject = getattr(dbrow, "rbacobject", sentinel)
             assert rbacobject != sentinel, f"loaded db row {dbrow} has not attribute rbacobject which is needed for permission test"
             state_id = getattr(dbrow, "state_id", sentinel)
             if state_id == sentinel:
                 # normal test
-                roles = RBACObjectGQLModel.resolve_user_roles_on_object(info=info, rbac_id=rbacobject)
-                roleids_needed = self.roleIdsNeeded(info=info, roleNames=roleNames)
+                roles = await RBACObjectGQLModel.resolve_user_roles_on_object(info=info, rbac_id=rbacobject)
+                roleids_needed = await self.roleIdsNeeded(info=info, roleNames=roleNames)
                 firstproperrole = next(filter(lambda role: role["type"]["id"] in roleids_needed, roles), None)
                 return firstproperrole is not None
             else:
@@ -441,7 +448,7 @@ def RoleBasedPermissionUpdate(roles: str, GQLModel):
 
     return RoleBasedPermissionResult
 
-def StateBasedPermission(GQLModel, parameterName=None, readPermission=True, writePermission=False):
+def StateBasedPermissionForRUDOps(GQLModel, parameterName=None, readPermission=True, writePermission=False):
     assert readPermission != writePermission, f"readPermission and writePermission have same value"
     class StateBasedPermissionResult(WithRolesPermission):
         def on_unauthorized(self) -> None:

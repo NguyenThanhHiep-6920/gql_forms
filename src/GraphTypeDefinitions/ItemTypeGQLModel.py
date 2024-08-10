@@ -8,7 +8,11 @@ from typing import Annotated
 from uoishelpers.resolvers import getLoadersFromInfo, getUserFromInfo
 
 from .BaseGQLModel import BaseGQLModel
-from ._GraphPermissions import RoleBasedPermission, OnlyForAuthentized
+from ._GraphPermissions import (
+    RoleBasedPermission, 
+    RoleBasedPermissionForRUDOps,
+    OnlyForAuthentized
+    )
 from ._GraphResolvers import (
     resolve_id,
     resolve_name,
@@ -155,7 +159,10 @@ async def form_item_type_insert(self, info: strawberry.types.Info, item_type: Fo
 
 @strawberry.mutation(
     description="U operation",
-    permission_classes=[OnlyForAuthentized])
+    permission_classes=[
+        OnlyForAuthentized,
+        RoleBasedPermissionForRUDOps("administrátor", GQLModel=ItemTypeGQLModel)
+        ])
 async def form_item_type_update(self, info: strawberry.types.Info, item_type: FormItemTypeUpdateGQLModel) -> FormItemTypeResultGQLModel:
     user = getUserFromInfo(info)
     item_type.changedby = uuid.UUID(user["id"])

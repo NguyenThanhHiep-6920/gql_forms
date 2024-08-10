@@ -305,13 +305,13 @@ async def form_request_insert(self, info: strawberry.types.Info, request: FormRe
     result.id = row.id
     return result
 
-from ._GraphPermissions import StateBasedPermission
+from ._GraphPermissions import StateBasedPermissionForRUDOps
 
 @strawberry.mutation(
     description="U operation",
     permission_classes=[
         OnlyForAuthentized,
-        StateBasedPermission(GQLModel=RequestGQLModel, parameterName="request", readPermission=False, writePermission=True)
+        StateBasedPermissionForRUDOps(GQLModel=RequestGQLModel, parameterName="request", readPermission=False, writePermission=True)
     ])
 async def form_request_update(self, info: strawberry.types.Info, request: FormRequestUpdateGQLModel) -> FormRequestResultGQLModel:
     user = getUserFromInfo(info)
@@ -349,7 +349,7 @@ async def form_request_update(self, info: strawberry.types.Info, request: FormRe
     description="U operation",
     permission_classes=[
         OnlyForAuthentized,
-        StateBasedPermission(GQLModel=RequestGQLModel, parameterName="request", readPermission=False, writePermission=True)
+        StateBasedPermissionForRUDOps(GQLModel=RequestGQLModel, parameterName="request", readPermission=False, writePermission=True)
         ],
     )
 async def form_request_use_transition(self, info: strawberry.types.Info, request: FormRequestUseTransitionGQLModel) -> FormRequestResultGQLModel:
