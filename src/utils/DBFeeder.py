@@ -61,9 +61,10 @@ def get_demodata():
     return jsonData
 
 async def initDB(asyncSessionMaker):
-
-    demoMode = os.environ.get("DEMODATA", None)
+    print("initDB Start", flush=True)
+    demoMode = os.environ.get("DEMODATA", None) == "True"
     if demoMode:
+        print("initDB Full DEMODATA", flush=True)
         dbModels = [
             FormCategoryModel,
             FormTypeModel,
@@ -86,5 +87,6 @@ async def initDB(asyncSessionMaker):
         
     jsonData = get_demodata()
     await ImportModels(asyncSessionMaker, dbModels, jsonData)
+    print("initDB End", flush=True)
     logging.info("data (if any) imported")
     pass
