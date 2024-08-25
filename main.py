@@ -223,6 +223,7 @@ JWTRESOLVEUSERPATHURL = envAssertDefined("JWTRESOLVEUSERPATHURL", None)
 assert (DEMO in ["True", "true", "False", "false"]), "DEMO environment variable can have only `True` or `False` values"
 DEMO = DEMO in ["True", "true"]
 
+
 if DEMO:
     print("####################################################")
     print("#                                                  #")
