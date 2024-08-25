@@ -31,7 +31,7 @@ from .ItemCategoryGQLModel import ItemCategoryGQLModel
 from .SectionGQLModel import SectionGQLModel
 from .PartGQLModel import PartGQLModel
 
-from .externals import UserGQLModel
+from .externals import UserGQLModel, StateGQLModel
 from ._GraphPermissions import RoleBasedPermission
 # from utils.Dataloaders import getUserFromInfo
 from uoishelpers.resolvers import getUserFromInfo
@@ -202,4 +202,4 @@ class Mutation:
 #
 ###########################################################################################################################
 
-schema = strawberry.federation.Schema(Query, types=(UserGQLModel, ), mutation=Mutation)
+schema = strawberry.federation.Schema(Query, types=(UserGQLModel, StateGQLModel), mutation=Mutation)

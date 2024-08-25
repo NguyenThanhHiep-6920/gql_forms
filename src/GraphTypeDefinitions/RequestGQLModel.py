@@ -8,10 +8,11 @@ import logging
 from typing import Annotated
 
 from uoishelpers.resolvers import getLoadersFromInfo, getUserFromInfo
+from uoishelpers.gqlpermissions import RoleBasedPermission, OnlyForAuthentized
 
-from ._GraphPermissions import RoleBasedPermission
+# from ._GraphPermissions import RoleBasedPermission
 from .BaseGQLModel import BaseGQLModel
-from ._GraphPermissions import RoleBasedPermission, OnlyForAuthentized
+# from ._GraphPermissions import RoleBasedPermission, OnlyForAuthentized
 from ._GraphResolvers import (
     resolve_id,
     resolve_name,
@@ -75,11 +76,25 @@ class RequestGQLModel(BaseGQLModel):
 
     @strawberry.field(
         description="""Request's time of last update""",
-        permission_classes=[OnlyForAuthentized])
+        permission_classes=[
+            OnlyForAuthentized
+            ])
     async def histories(self, info: strawberry.types.Info) -> typing.List["HistoryGQLModel"]:
         loader = getLoadersFromInfo(info).histories
         result = await loader.filter_by(request_id=self.id)
         return result
+    
+    @strawberry.field(
+        description="""gdpr check""",
+        permission_classes=[
+            OnlyForAuthentized,
+            RoleBasedPermission("zpracovatel gdpr")
+        ])
+    async def gdpr(self, info: strawberry.types.Info, force: typing.Optional[bool] = False) -> typing.Optional[str]:
+        if force:
+            return "gdpr information"
+        else:
+            return None
 
     @strawberry.field(
         description="Retrieves the user who has initiated this request",
@@ -112,6 +127,7 @@ class RequestWhereFilter:
     name: str
     name_en: str
     createdby: uuid.UUID
+    state_id: uuid.UUID
 
 @strawberry.field(
     description="""Finds an request by their id""",
@@ -305,13 +321,13 @@ async def form_request_insert(self, info: strawberry.types.Info, request: FormRe
     result.id = row.id
     return result
 
-from ._GraphPermissions import StateBasedPermissionForRUDOps
+from ._GraphPermissions import StateBasedPermissionForUDOps
 
 @strawberry.mutation(
     description="U operation",
     permission_classes=[
         OnlyForAuthentized,
-        StateBasedPermissionForRUDOps(GQLModel=RequestGQLModel, parameterName="request", readPermission=False, writePermission=True)
+        StateBasedPermissionForUDOps(GQLModel=RequestGQLModel, parameterName="request", readPermission=False, writePermission=True)
     ])
 async def form_request_update(self, info: strawberry.types.Info, request: FormRequestUpdateGQLModel) -> FormRequestResultGQLModel:
     user = getUserFromInfo(info)
@@ -349,10 +365,10 @@ async def form_request_update(self, info: strawberry.types.Info, request: FormRe
     description="U operation",
     permission_classes=[
         OnlyForAuthentized,
-        StateBasedPermissionForRUDOps(GQLModel=RequestGQLModel, parameterName="request", readPermission=False, writePermission=True)
+        StateBasedPermissionForUDOps(GQLModel=RequestGQLModel, parameterName="request", readPermission=False, writePermission=True)
         ],
     )
-async def form_request_use_transition(self, info: strawberry.types.Info, request: FormRequestUseTransitionGQLModel) -> FormRequestResultGQLModel:
+async def form_request_use_transition(self, info: strawberry.types.Info, request: FormRequestUseTransitionGQLModel) -> typing.Optional[FormRequestResultGQLModel]:
     # create copy of current form
     # make row in histories
     # change state of request

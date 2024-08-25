@@ -269,7 +269,7 @@ roleIndex = { role["name_en"]: role["id"] for role in rolelist }
 def RolesToList(roles: str = ""):
     roleNames = roles.split(";")
     roleNames = list(map(lambda item: item.strip(), roleNames))
-    roleIdsNeeded = list(map(lambda roleName: roleIndex[roleName], roleNames))
+    roleIdsNeeded = list(map(lambda roleName: roleIndex.get(roleName, None), roleNames))
     return roleIdsNeeded
 
 # from src.utils.Dataloaders import getLoadersFromInfo
@@ -448,12 +448,58 @@ def RoleBasedPermissionForRUDOps(roles: str, GQLModel):
 
     return RoleBasedPermissionResult
 
-def StateBasedPermissionForRUDOps(GQLModel, parameterName=None, readPermission=True, writePermission=False):
+def StateBasedPermissionForROp(GQLModel, parameterName=None, readPermission=True, writePermission=False):
     assert readPermission != writePermission, f"readPermission and writePermission have same value"
     class StateBasedPermissionResult(WithRolesPermission):
         def on_unauthorized(self) -> None:
             return self.defaultResult
         
+        async def has_permission(
+                self, source: Any, info: strawberry.types.Info, **kwargs: Any
+            # self, source, info: strawberry.types.Info, **kwargs
+            # self, source, **kwargs
+        ) -> bool:
+            # return False
+            # logging.info(f"has_permission {kwargs}")
+            self.defaultResult = [] if info._field.type.__class__ == StrawberryList else None
+            if source is None:
+                loader = GQLModel.getLoader(info=info)
+                if parameterName is None:
+                    [parameterValue, *_] = kwargs.values()
+                else:
+                    parameterValue = kwargs[parameterName] 
+                id = getattr(parameterValue, "id", sentinel)
+                assert id != sentinel, f"It has bee found during permission test that the parameter of resolve has no id attribute"
+                dbrow = await loader.load(id)
+            else:
+                dbrow = source
+            rbacobject = getattr(dbrow, "rbacobject", sentinel)
+            assert rbacobject != sentinel, f"loaded db row {dbrow} has not attribute rbacobject which is needed for permission test"
+            state_id = getattr(dbrow, "state_id", sentinel)
+            assert state_id != sentinel, f"{dbrow} has not attribute state_id which is needed for permission resolution"
+            userRoles = await RBACObjectGQLModel.resolve_user_roles(info=info)
+            # print(f"StateBasedPermission.userRoles {userRoles}", flush=True)
+            roletypes = await RBACObjectGQLModel.resolve_role_types_on_state(info=info, state_id=state_id, readPermission=readPermission, writePermission=writePermission)
+            print(f"StateBasedPermission.roletypes {roletypes}", flush=True)
+            neededRoleIds = list(map(lambda roleType: roleType["id"], roletypes))
+            print(f"StateBasedPermission.neededRoleIds {neededRoleIds}", flush=True)
+            appropriateRole = next(filter(lambda userRole: userRole["type"]["id"] in neededRoleIds, userRoles), None)
+            print(f"StateBasedPermission.appropriateRole {appropriateRole}", flush=True)
+            return appropriateRole is not None
+
+    return StateBasedPermissionResult
+
+def StateBasedPermissionForUDOps(GQLModel, parameterName=None, readPermission=True, writePermission=False):
+    assert readPermission != writePermission, f"readPermission and writePermission have same value"
+    
+    class StateBasedPermissionResult(WithRolesPermission):
+        message = "You are not authorized"
+        # def on_unauthorized(self) -> None:
+        #     raise Exception("You are not authorized")
+        #     # return self.defaultResult
+        # error_extensions = {"code": "UNAUTHORIZED"}
+        error_extensions = {"code": "You are not authorized CODE"}
+
         async def has_permission(
                 self, source: Any, info: strawberry.types.Info, **kwargs: Any
             # self, source, info: strawberry.types.Info, **kwargs

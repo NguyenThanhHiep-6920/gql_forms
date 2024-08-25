@@ -165,7 +165,7 @@ async def apollo_gql(request: Request, item: Item):
     DEMOE = os.getenv("DEMO", None)
 
     sentinelResult = await sentinel(request, item)
-    if DEMOE == "False":
+    if DEMOE in ["False", "false"]:
         if sentinelResult:
             logging.info(f"sentinel test failed for query={item} \n request={request}")
             return sentinelResult
@@ -220,8 +220,8 @@ GQLUG_ENDPOINT_URL = envAssertDefined("GQLUG_ENDPOINT_URL", None)
 JWTPUBLICKEYURL = envAssertDefined("JWTPUBLICKEYURL", None)
 JWTRESOLVEUSERPATHURL = envAssertDefined("JWTRESOLVEUSERPATHURL", None)
 
-assert (DEMO == "True") or (DEMO == "False"), "DEMO environment variable can have only `True` or `False` values"
-DEMO = DEMO == "True"
+assert (DEMO in ["True", "true", "False", "false"]), "DEMO environment variable can have only `True` or `False` values"
+DEMO = DEMO in ["True", "true"]
 
 if DEMO:
     print("####################################################")
