@@ -62,7 +62,7 @@ def get_demodata():
 
 async def initDB(asyncSessionMaker):
     print("initDB Start", flush=True)
-    demoMode = os.environ.get("DEMODATA", None) == "True"
+    demoMode = os.environ.get("DEMODATA", None) in ["True", "true"]
     if demoMode:
         print("initDB Full DEMODATA", flush=True)
         dbModels = [
