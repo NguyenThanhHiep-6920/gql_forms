@@ -4,6 +4,8 @@ uvicorn[standard]
 gunicorn
 
 asyncpg
+sqlalchemy-cockroachdb
+
 aiohttp
 requests
 
